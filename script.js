@@ -104,9 +104,10 @@ function renderLocation(index) {
             </div>
           `).join('')}
         </div>
-        <div style="margin-top: 1rem; display:flex; gap: 1rem;">
+        <div style="margin-top: 1rem; display:flex; gap: 1rem; flex-wrap: wrap;">
           <button class="button" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
           <button class="button" onclick="rollDice()">Бросить кости</button>
+          <button class="button" onclick="openInventory()">Инвентарь</button>
         </div>
       </div>
 
@@ -153,6 +154,68 @@ function performRoll(button) {
     return ` ${input.value}: ${Math.floor(Math.random() * sides) + 1}`;
   });
   button.nextElementSibling.innerHTML = `<p>Результат: ${results.join(', ')}</p>`;
+}
+
+// Открытие инвентаря
+function openInventory() {
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  let inventoryItems = [...selectedCharacter.inventory];
+
+  modal.innerHTML = `
+    <div class="modal-content">
+      <h3>Инвентарь</h3>
+      <div id="inventory-list" style="max-height: 300px; overflow-y: auto;"></div>
+      <div style="margin-top: 1rem;">
+        <input type="text" id="new-item-input" placeholder="Новый предмет" style="width:70%; padding: 0.5rem;" />
+        <button class="button" onclick="addItem(inventoryItems)">Добавить</button>
+      </div>
+      <button class="button close-button" onclick="closeModalAndSave(modal, inventoryItems)" style="margin-top: 1rem;">Закрыть</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+
+  renderInventoryList(inventoryItems, document.getElementById('inventory-list'));
+}
+
+// Отрисовка списка инвентаря
+function renderInventoryList(items, container) {
+  container.innerHTML = '';
+  items.forEach((item, index) => {
+    const itemDiv = document.createElement('div');
+    itemDiv.style.marginBottom = '0.5rem';
+    itemDiv.innerHTML = `
+      <input type="text" value="${item}" onchange="items[${index}] = this.value" style="width: 80%; padding: 0.4rem;" />
+      <button class="button" onclick="removeItem(${index}, items, this.closest('.modal-content'))">Удалить</button>
+    `;
+    container.appendChild(itemDiv);
+  });
+}
+
+// Добавление предмета
+function addItem(items) {
+  const input = document.getElementById('new-item-input');
+  const newItem = input.value.trim();
+  if (newItem !== '') {
+    items.push(newItem);
+    input.value = '';
+    renderInventoryList(items, document.getElementById('inventory-list'));
+  }
+}
+
+// Удаление предмета
+function removeItem(index, items, container) {
+  items.splice(index, 1);
+  renderInventoryList(items, container.querySelector('#inventory-list'));
+}
+
+// Сохранение и закрытие
+function closeModalAndSave(modal, items) {
+  selectedCharacter.inventory = items;
+  localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
+  modal.remove();
 }
 
 // Инициализация
