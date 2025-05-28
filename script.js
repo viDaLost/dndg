@@ -108,6 +108,7 @@ function renderLocation(index) {
           <button class="button" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
           <button class="button" onclick="rollDice()">Бросить кости</button>
           <button class="button" onclick="openInventory()">Инвентарь</button>
+          <button class="button" onclick="openNotes()">Заметки</button>
         </div>
       </div>
 
@@ -221,6 +222,76 @@ function renderInventoryList(items, container) {
     itemDiv.querySelector('input').oninput = (e) => {
       items[index] = e.target.value;
     };
+  });
+}
+
+// Открытие заметок
+function openNotes() {
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  let notes = selectedCharacter.notes || [];
+
+  modal.innerHTML = `
+    <div class="modal-content">
+      <h3>Заметки</h3>
+      <input type="text" id="note-input" placeholder="Введите заметку..." style="width: 90%; padding: 0.5rem; margin-bottom: 1rem;" />
+      <button class="button" id="add-note-btn">Добавить</button>
+      <div id="notes-list" style="max-height: 300px; overflow-y: auto; margin-top: 1rem;"></div>
+      <button class="button close-button" id="close-notes-btn" style="margin-top: 1rem;">Закрыть</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+
+  const listContainer = modal.querySelector('#notes-list');
+  const noteInput = modal.querySelector('#note-input');
+
+  // Рендер заметок
+  renderNotesList(notes, listContainer);
+
+  // Добавление новой заметки
+  modal.querySelector('#add-note-btn').onclick = () => {
+    const text = noteInput.value.trim();
+    if (text) {
+      notes.push(text);
+      noteInput.value = '';
+      renderNotesList(notes, listContainer);
+    }
+  };
+
+  // Закрытие окна и сохранение
+  modal.querySelector('#close-notes-btn').onclick = () => {
+    selectedCharacter.notes = notes;
+    localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
+    modal.remove();
+  };
+}
+
+// Отрисовка списка заметок
+function renderNotesList(notes, container) {
+  container.innerHTML = '';
+  notes.forEach((note, index) => {
+    const noteDiv = document.createElement('div');
+    noteDiv.style.marginBottom = '1rem';
+
+    noteDiv.innerHTML = `
+      <textarea rows="2" style="width: 90%; padding: 0.4rem;">${note}</textarea>
+      <button class="button delete-note-btn">Удалить</button>
+    `;
+
+    // Удаление заметки
+    noteDiv.querySelector('.delete-note-btn').onclick = () => {
+      notes.splice(index, 1);
+      renderNotesList(notes, container);
+    };
+
+    // Сохранение изменений при редактировании
+    noteDiv.querySelector('textarea').oninput = (e) => {
+      notes[index] = e.target.value;
+    };
+
+    container.appendChild(noteDiv);
   });
 }
 
