@@ -168,16 +168,35 @@ function openInventory() {
       <div id="inventory-list" style="max-height: 300px; overflow-y: auto;"></div>
       <div style="margin-top: 1rem;">
         <input type="text" id="new-item-input" placeholder="Новый предмет" style="width:70%; padding: 0.5rem;" />
-        <button class="button" onclick="addItem(inventoryItems)">Добавить</button>
+        <button class="button" id="add-item-btn">Добавить</button>
       </div>
-      <button class="button close-button" onclick="closeModalAndSave(modal, inventoryItems)" style="margin-top: 1rem;">Закрыть</button>
+      <button class="button close-button" id="close-inventory-btn" style="margin-top: 1rem;">Закрыть</button>
     </div>
   `;
 
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 
-  renderInventoryList(inventoryItems, document.getElementById('inventory-list'));
+  const listContainer = modal.querySelector('#inventory-list');
+  renderInventoryList(inventoryItems, listContainer);
+
+  // Добавление нового предмета
+  modal.querySelector('#add-item-btn').onclick = () => {
+    const input = modal.querySelector('#new-item-input');
+    const newItem = input.value.trim();
+    if (newItem !== '') {
+      inventoryItems.push(newItem);
+      input.value = '';
+      renderInventoryList(inventoryItems, listContainer);
+    }
+  };
+
+  // Закрытие окна и сохранение
+  modal.querySelector('#close-inventory-btn').onclick = () => {
+    selectedCharacter.inventory = inventoryItems;
+    localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
+    modal.remove();
+  };
 }
 
 // Отрисовка списка инвентаря
@@ -187,35 +206,22 @@ function renderInventoryList(items, container) {
     const itemDiv = document.createElement('div');
     itemDiv.style.marginBottom = '0.5rem';
     itemDiv.innerHTML = `
-      <input type="text" value="${item}" onchange="items[${index}] = this.value" style="width: 80%; padding: 0.4rem;" />
-      <button class="button" onclick="removeItem(${index}, items, this.closest('.modal-content'))">Удалить</button>
+      <input type="text" value="${item}" style="width: 80%; padding: 0.4rem;" />
+      <button class="button delete-item-btn">Удалить</button>
     `;
     container.appendChild(itemDiv);
+
+    // Удаление предмета
+    itemDiv.querySelector('.delete-item-btn').onclick = () => {
+      items.splice(index, 1);
+      renderInventoryList(items, container);
+    };
+
+    // Обновление предмета
+    itemDiv.querySelector('input').oninput = (e) => {
+      items[index] = e.target.value;
+    };
   });
-}
-
-// Добавление предмета
-function addItem(items) {
-  const input = document.getElementById('new-item-input');
-  const newItem = input.value.trim();
-  if (newItem !== '') {
-    items.push(newItem);
-    input.value = '';
-    renderInventoryList(items, document.getElementById('inventory-list'));
-  }
-}
-
-// Удаление предмета
-function removeItem(index, items, container) {
-  items.splice(index, 1);
-  renderInventoryList(items, container.querySelector('#inventory-list'));
-}
-
-// Сохранение и закрытие
-function closeModalAndSave(modal, items) {
-  selectedCharacter.inventory = items;
-  localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
-  modal.remove();
 }
 
 // Инициализация
