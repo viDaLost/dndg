@@ -29,7 +29,7 @@ function renderCharacterSelection() {
   const html = `
     <div class="container">
       <h2>Выберите персонажа</h2>
-      ${data.characters.map(char => `
+      ${data.characters.characters.map(char => `
         <div class="card">
           <img src="images/${char.image}" class="character-image" onclick="showCharacterCard(${char.id})"/>
           <h3>${char.name}</h3>
@@ -44,7 +44,7 @@ function renderCharacterSelection() {
 
 // Карточка персонажа
 function showCharacterCard(id) {
-  const char = data.characters.find(c => c.id === id);
+  const char = data.characters.characters.find(c => c.id === id);
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.innerHTML = `
@@ -68,7 +68,7 @@ function showCharacterCard(id) {
 
 // Выбор персонажа
 function selectCharacter(id) {
-  selectedCharacter = data.characters.find(c => c.id === id);
+  selectedCharacter = data.characters.characters.find(c => c.id === id);
   renderLocation(currentLocationIndex);
 }
 
@@ -76,38 +76,34 @@ function selectCharacter(id) {
 function renderLocation(index) {
   const loc = data.locations.locations[index];
   if (!loc) return;
-
-  // Установка цветовой схемы
+  
   document.body.style.background = loc.style.background;
   document.body.style.color = loc.style.color;
-
+  
   app.innerHTML = `
     <div class="container">
       <h1>${loc.title}</h1>
       <p>${loc.description}</p>
       <img src="images/${loc.image}" class="location-image"/>
-
+      
       <!-- Меню действий -->
-      <div class="card" style="background:${loc.style.background}; border:1px solid ${loc.style.color}66; color:${loc.style.color}">
+      <div class="card">
         <h3>Характеристики</h3>
-        <div class="stats-grid">
-          ${Object.entries(selectedCharacter.stats).map(([k,v]) => `
-            <div class="stat-row">
-              <label>${k}</label>
-              <input type="number" value="${v}" onchange="updateStat('${k}', this.value)" 
-                     style="background:${loc.style.background}; color:${loc.style.color}; border:1px solid ${loc.style.color}88; padding: 0.5rem; border-radius: 5px;"/>
-            </div>
-          `).join('')}
-        </div>
-
-        <button class="button small" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
-        <button class="button small" onclick="rollDice()">Бросить кости</button>
+        ${Object.entries(selectedCharacter.stats).map(([k,v]) => `
+          <div>
+            <label>${k}: </label>
+            <input type="number" value="${v}" onchange="updateStat('${k}', this.value)"/>
+          </div>
+        `).join('')}
+        
+        <button class="button" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
+        <button class="button" onclick="rollDice()">Бросить кости</button>
       </div>
-
+      
       <!-- Навигация -->
       <div>
-        ${index > 0 ? `<button class="button" onclick="renderLocation(${index-1})">← Предыдущая</button>` : ''}
-        ${index < data.locations.locations.length - 1 ? `<button class="button" onclick="renderLocation(${index+1})">Следующая локация →</button>` : ''}
+        ${index > 0 ? `<button class="button" onclick="renderLocation(${index-1})">Предыдущая локация</button>` : ''}
+        ${index < data.locations.locations.length-1 ? `<button class="button" onclick="renderLocation(${index+1})">Следующая локация</button>` : ''}
         <button class="button" onclick="renderMainMenu()">Главное меню</button>
       </div>
     </div>
@@ -126,31 +122,26 @@ function rollDice() {
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.innerHTML = `
-    <div class="modal-content" style="background:${document.body.style.background}; color:${document.body.style.color}">
+    <div class="modal-content">
       <h3>Выберите кости</h3>
       ${diceOptions.map(d => `
         <label><input type="checkbox" value="${d}"/> ${d}</label><br/>
       `).join('')}
       <button class="button" onclick="performRoll(this)">Бросить</button>
       <div id="dice-result"></div>
-      <button class="button" onclick="this.closest('.modal').style.display='none'" style="margin-top: 1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 }
 
-// Результат броска костей
 function performRoll(button) {
   const checked = document.querySelectorAll('input:checked');
   const results = Array.from(checked).map(input => {
     const sides = parseInt(input.value.replace('D', ''));
-    return `${input.value}: ${Math.floor(Math.random() * sides) + 1}`;
+    return ` ${input.value}: ${Math.floor(Math.random() * sides) + 1}`;
   });
-
-  button.nextElementSibling.innerHTML = `
-    <p>Результат: ${results.join(', ')}</p>
-  `;
+  button.nextElementSibling.innerHTML = `<p>Результат: ${results.join(', ')}</p>`;
 }
 
 // Инициализация
