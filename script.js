@@ -33,7 +33,7 @@ function renderCharacterSelection() {
         <div class="card">
           <img src="images/${char.image}" class="character-image" onclick="showCharacterCard(${char.id})"/>
           <h3>${char.name}</h3>
-          <p>${char.class}</p>
+          <p><strong>Класс:</strong> ${char.class}</p>
           <button class="button" onclick="selectCharacter(${char.id})">Выбрать</button>
         </div>
       `).join('')}
@@ -68,7 +68,10 @@ function showCharacterCard(id) {
 
 // Выбор персонажа
 function selectCharacter(id) {
-  selectedCharacter = data.characters.characters.find(c => c.id === id);
+  selectedCharacter = JSON.parse(JSON.stringify(data.characters.characters.find(c => c.id === id)));
+  localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
+  localStorage.setItem('currentLocationIndex', 0);
+  currentLocationIndex = 0;
   renderLocation(currentLocationIndex);
 }
 
@@ -76,34 +79,41 @@ function selectCharacter(id) {
 function renderLocation(index) {
   const loc = data.locations.locations[index];
   if (!loc) return;
-  
-  document.body.style.background = loc.style.background;
-  document.body.style.color = loc.style.color;
-  
+
+  // Сохраняем индекс текущей локации
+  currentLocationIndex = index;
+  localStorage.setItem('currentLocationIndex', index);
+
+  document.body.style.background = loc.style.background || '#1e1e2f';
+  document.body.style.color = loc.style.color || '#fff';
+
   app.innerHTML = `
     <div class="container">
       <h1>${loc.title}</h1>
       <p>${loc.description}</p>
       <img src="images/${loc.image}" class="location-image"/>
-      
+
       <!-- Меню действий -->
-      <div class="card">
+      <div class="card stats-card">
         <h3>Характеристики</h3>
-        ${Object.entries(selectedCharacter.stats).map(([k,v]) => `
-          <div>
-            <label>${k}: </label>
-            <input type="number" value="${v}" onchange="updateStat('${k}', this.value)"/>
-          </div>
-        `).join('')}
-        
-        <button class="button" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
-        <button class="button" onclick="rollDice()">Бросить кости</button>
+        <div class="stats-grid">
+          ${Object.entries(selectedCharacter.stats).map(([k,v]) => `
+            <div class="stat-box">
+              <label>${k}</label>
+              <input type="number" value="${v}" onchange="updateStat('${k}', this.value)"/>
+            </div>
+          `).join('')}
+        </div>
+        <div style="margin-top: 1rem; display:flex; gap: 1rem;">
+          <button class="button" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
+          <button class="button" onclick="rollDice()">Бросить кости</button>
+        </div>
       </div>
-      
+
       <!-- Навигация -->
-      <div>
+      <div class="navigation-buttons">
         ${index > 0 ? `<button class="button" onclick="renderLocation(${index-1})">Предыдущая локация</button>` : ''}
-        ${index < data.locations.locations.length-1 ? `<button class="button" onclick="renderLocation(${index+1})">Следующая локация</button>` : ''}
+        ${index < data.locations.locations.length - 1 ? `<button class="button" onclick="renderLocation(${index+1})">Следующая локация</button>` : ''}
         <button class="button" onclick="renderMainMenu()">Главное меню</button>
       </div>
     </div>
@@ -129,6 +139,7 @@ function rollDice() {
       `).join('')}
       <button class="button" onclick="performRoll(this)">Бросить</button>
       <div id="dice-result"></div>
+      <button class="button close-button" onclick="this.closest('.modal').style.display='none'" style="margin-top: 1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
@@ -148,5 +159,16 @@ function performRoll(button) {
 let data;
 loadData().then(d => {
   data = d;
-  renderMainMenu();
+
+  // Восстановление состояния
+  const savedChar = localStorage.getItem('selectedCharacter');
+  const savedIndex = localStorage.getItem('currentLocationIndex');
+
+  if (savedChar && savedIndex !== null) {
+    selectedCharacter = JSON.parse(savedChar);
+    currentLocationIndex = parseInt(savedIndex);
+    renderLocation(currentLocationIndex);
+  } else {
+    renderMainMenu();
+  }
 });
