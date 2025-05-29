@@ -205,23 +205,19 @@ function renderInventoryList(items, container) {
   container.innerHTML = '';
   items.forEach((item, index) => {
     const itemDiv = document.createElement('div');
-    itemDiv.style.marginBottom = '0.5rem';
+    itemDiv.style.marginBottom = '1rem';
+
     itemDiv.innerHTML = `
-      <input type="text" value="${item}" style="width: 80%; padding: 0.4rem;" />
+      <input type="text" value="${item}" style="width: 80%; padding: 0.4rem;" oninput="items[${index}] = this.value"/>
       <button class="button delete-item-btn">Удалить</button>
     `;
-    container.appendChild(itemDiv);
 
-    // Удаление предмета
     itemDiv.querySelector('.delete-item-btn').onclick = () => {
       items.splice(index, 1);
       renderInventoryList(items, container);
     };
 
-    // Обновление предмета
-    itemDiv.querySelector('input').oninput = (e) => {
-      items[index] = e.target.value;
-    };
+    container.appendChild(itemDiv);
   });
 }
 
@@ -247,10 +243,9 @@ function openNotes() {
   const listContainer = modal.querySelector('#notes-list');
   const noteInput = modal.querySelector('#note-input');
 
-  // Рендер заметок
   renderNotesList(notes, listContainer);
 
-  // Добавление новой заметки
+  // Добавление заметки
   modal.querySelector('#add-note-btn').onclick = () => {
     const text = noteInput.value.trim();
     if (text) {
@@ -260,7 +255,7 @@ function openNotes() {
     }
   };
 
-  // Закрытие окна и сохранение
+  // Закрытие окна
   modal.querySelector('#close-notes-btn').onclick = () => {
     selectedCharacter.notes = notes;
     localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
@@ -280,13 +275,13 @@ function renderNotesList(notes, container) {
       <button class="button delete-note-btn">Удалить</button>
     `;
 
-    // Удаление заметки
+    // Удаление
     noteDiv.querySelector('.delete-note-btn').onclick = () => {
       notes.splice(index, 1);
       renderNotesList(notes, container);
     };
 
-    // Сохранение изменений при редактировании
+    // Редактирование
     noteDiv.querySelector('textarea').oninput = (e) => {
       notes[index] = e.target.value;
     };
