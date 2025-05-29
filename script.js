@@ -30,13 +30,13 @@ function renderCharacterSelection() {
     <div class="container">
       <h2>Выберите персонажа</h2>
       ${data.characters.characters
-        .filter(char => !['andrey', 'porje'].includes(char.id))
+        .filter(char => !['korgreyv', 'porje', 'andrey'].includes(char.id))
         .map(char => `
         <div class="card">
-          <img src="images/${char.image}" class="character-image" onclick="showCharacterCard(${char.id})"/>
+          <img src="images/${char.image}" class="character-image" onclick="showCharacterCard('${char.id}')"/>
           <h3>${char.name}</h3>
           <p><strong>Класс:</strong> ${char.class}</p>
-          <button class="button" onclick="selectCharacter(${char.id})">Выбрать</button>
+          <button class="button" onclick="selectCharacter('${char.id}')">Выбрать</button>
         </div>
       `).join('')}
     </div>
@@ -129,7 +129,7 @@ function renderLocation(index) {
 
 // Открытие нового экрана с персонажами
 function showNewCharacters() {
-  const newChars = ['andrey', 'porje']
+  const newChars = ['korgreyv', 'porje']
     .map(id => data.characters.characters.find(c => c.id === id))
     .filter(Boolean);
 
@@ -163,17 +163,9 @@ function switchCharacter(newCharId) {
   const newChar = data.characters.characters.find(c => c.id === newCharId);
   const oldChar = selectedCharacter;
 
-  // Меняем местами ID в списке, чтобы можно было снова выбрать старого
-  const chars = data.characters.characters;
-  const oldIndex = chars.findIndex(c => c.id === oldChar.id);
-  const newIndex = chars.findIndex(c => c.id === newChar.id);
-  chars[oldIndex].id = newChar.id;
-  chars[newIndex].id = oldChar.id;
-
   // Обновляем выбранный персонаж
   selectedCharacter = newChar;
   localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
-  localStorage.setItem('characters', JSON.stringify(chars));
 
   // Закрываем модальное окно
   document.querySelector('.modal').style.display = 'none';
@@ -234,7 +226,6 @@ function openInventory() {
       <button class="button close-button" id="close-inventory-btn" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
-
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 
@@ -286,7 +277,6 @@ function openNotes() {
       <button class="button close-button" id="close-notes-btn" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
-
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 
