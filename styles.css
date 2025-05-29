@@ -41,7 +41,8 @@ body {
   opacity: 1;
 }
 
-.button {
+.button,
+.styled-button {
   background: #8b5e3c;
   color: white;
   padding: 0.75rem 1.5rem;
@@ -54,7 +55,8 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.button:hover {
+.button:hover,
+.styled-button:hover {
   background: #a96c4b;
   transform: scale(1.02);
 }
@@ -101,7 +103,7 @@ body {
 }
 
 .stat-box {
-  flex: 1 1 48%;
+  flex: 1 1 calc(25% - 1rem);
   min-width: 120px;
   background-color: #3a3a5a;
   padding: 1rem;
@@ -116,22 +118,22 @@ body {
 }
 
 .stat-box input {
-  width: 100%;
-  padding: 0.4rem;
+  width: 60px;
+  padding: 0.3rem;
+  text-align: center;
   border-radius: 4px;
   border: none;
-  background-color: #2e1f0f;
+  background: #2e1f0f;
   color: #fff;
   font-size: 1rem;
-  text-align: center;
 }
 
-/* Кнопки действий в одну строку */
+/* Кнопки действий (в одну строку) */
 .action-buttons-row {
   display: flex;
   flex-wrap: nowrap;
-  gap: 0.5rem;
   justify-content: space-between;
+  gap: 0.5rem;
   margin-top: 1.5rem;
 }
 
@@ -140,22 +142,48 @@ body {
     flex-wrap: wrap;
   }
 
-  .stat-box {
-    flex: 1 1 100%;
-  }
-
-  .button {
+  .action-buttons-row .button,
+  .action-buttons-row .styled-button {
     width: 100%;
     font-size: 1rem;
   }
 
-  .character-image,
-  .location-image {
-    width: 100%;
+  .stat-box {
+    flex: 1 1 48%;
   }
 }
 
-/* Контейнеры для изображений */
+/* Навигационные кнопки (предыдущая / следующая) */
+.navigation-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.navigation-buttons .button,
+.navigation-buttons .styled-button {
+  flex: 1 1 48%;
+  min-width: 48%;
+}
+
+/* Кнопка "Главное меню" — одна большая кнопка внизу */
+.main-menu-button {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.main-menu-btn,
+.main-menu-button .button,
+.main-menu-button .styled-button {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 0.8rem 1.5rem;
+}
+
+/* Индикатор загрузки изображения */
 .image-container {
   position: relative;
   width: 100%;
@@ -172,29 +200,16 @@ body {
   z-index: 2;
 }
 
+.location-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
 .location-image.loaded {
   opacity: 1;
-}
-
-/* Навигационные кнопки */
-.navigation-buttons {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-  flex-wrap: wrap;
-}
-
-/* Стиль главной кнопки "Главное меню" */
-.main-menu-button {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-}
-
-.main-menu-btn {
-  background-color: #ff4b5c;
-  width: 100%;
-  font-size: 1.1rem;
 }
 
 /* Анимация перехода между локациями */
@@ -206,4 +221,60 @@ body {
 .fade-in {
   opacity: 1;
   transition: opacity 0.4s ease-in-out;
+}
+
+/* Стили модального окна инвентаря и заметок */
+.inventory-item,
+.note-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.inventory-item input,
+.note-item textarea {
+  width: 80%;
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: none;
+  background: #3a3a5a;
+  color: #fff;
+}
+
+.inventory-item button,
+.note-item button {
+  flex-shrink: 0;
+}
+
+/* Дополнительная стилизация для новых персонажей */
+.new-characters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.new-char-card {
+  background: #2e1f0f;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.new-char-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+/* Загрузка изображений в модальных окнах */
+.modal .loading-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.9rem;
+  color: #ccc;
+  z-index: 2;
 }
