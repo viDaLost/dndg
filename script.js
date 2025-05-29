@@ -14,63 +14,40 @@ async function loadData() {
   };
 }
 
-// Предзагрузка изображений
-function preloadImages(imagePaths, callback) {
-  let loadedCount = 0;
-  imagePaths.forEach(src => {
-    const img = new Image();
-    img.src = src;
-    img.onload = () => {
-      loadedCount++;
-      if (loadedCount === imagePaths.length) {
-        callback();
-      }
-    };
-    img.onerror = () => {
-      loadedCount++;
-      if (loadedCount === imagePaths.length) {
-        callback();
-      }
-    };
-  });
-}
-
 // Главное меню
 function renderMainMenu() {
   app.innerHTML = `
     <div class="container" style="text-align:center;">
       <h1>Записки сумасшедшего</h1>
-      <button class="button" onclick="renderCharacterSelection()">Начать прохождение</button>
+      <button class="styled-button" onclick="renderCharacterSelection()">Начать прохождение</button>
     </div>
   `;
 }
 
 // Выбор персонажа
 function renderCharacterSelection() {
-  // Собираем все пути к изображениям персонажей
-  const imagesToPreload = data.characters.characters
-    .filter(char => !['korgreyv', 'porje'].includes(char.id))
-    .map(char => `images/${char.image}`);
+  // Сбрасываем предыдущего персонажа
+  selectedCharacter = null;
 
-  // Предзагружаем изображения
-  preloadImages(imagesToPreload, () => {
-    const html = `
-      <div class="container">
-        <h2>Выберите персонажа</h2>
-        ${data.characters.characters
-          .filter(char => !['korgreyv', 'porje'].includes(char.id))
-          .map(char => `
-          <div class="card">
-            <img src="images/${char.image}" class="character-image" onload="this.style.opacity=1;" />
+  const html = `
+    <div class="container">
+      <h2>Выберите персонажа</h2>
+      ${data.characters.characters
+        .filter(char => !['korgreyv', 'porje'].includes(char.id))
+        .map(char => `
+        <div class="character-card">
+          <img src="images/${char.image}" class="character-image" onload="this.style.opacity=1;" />
+          <div class="character-info">
             <h3>${char.name}</h3>
             <p><strong>Класс:</strong> ${char.class}</p>
-            <button class="button" onclick="selectCharacter('${char.id}')">Выбрать</button>
+            <p>${char.description.substring(0, 80)}...</p>
+            <button class="styled-button select-character-btn" onclick="selectCharacter('${char.id}')">Выбрать</button>
           </div>
-        `).join('')}
-      </div>
-    `;
-    app.innerHTML = html;
-  });
+        </div>
+      `).join('')}
+    </div>
+  `;
+  app.innerHTML = html;
 }
 
 // Карточка персонажа
@@ -83,7 +60,7 @@ function showCharacterCard(id) {
   modal.innerHTML = `
     <div class="modal-content">
       <h2>${char.name}</h2>
-      <img src="images/${char.image}" class="character-image" onload="this.style.opacity=1;"/>
+      <img src="images/${char.image}" class="character-image loaded" />
       <p><strong>Класс:</strong> ${char.class}</p>
       <p><strong>Описание:</strong> ${char.description}</p>
       <h4>Характеристики:</h4>
@@ -92,7 +69,7 @@ function showCharacterCard(id) {
       <ul>${char.inventory.map(i => `<li>${i}</li>`).join('')}</ul>
       <h4>Способности:</h4>
       <ul>${char.abilities.map(a => `<li>${a}</li>`).join('')}</ul>
-      <button class="button" onclick="this.closest('.modal').style.display='none'">Закрыть</button>
+      <button class="styled-button close-modal-btn" onclick="this.closest('.modal').style.display='none'">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
@@ -118,13 +95,15 @@ function renderLocation(index) {
   const loc = data.locations.locations[index];
   if (!loc) return;
 
-  // Сохраняем текущую локацию
+  // Сохраняем индекс текущей локации
   currentLocationIndex = index;
   localStorage.setItem('currentLocationIndex', index);
 
   // Фиксируем фон приложения
   document.body.style.background = '#2e2e2e';
   document.body.style.color = '#f5f5dc';
+
+  const extraButton = index === 4 ? `<button class="styled-button" onclick="showNewCharacters()">Персонажи</button>` : '';
 
   // Предзагрузка изображения локации
   const locationImage = new Image();
@@ -133,68 +112,72 @@ function renderLocation(index) {
     app.classList.add('fade-out');
 
     setTimeout(() => {
-      const extraButton = index === 4 ? `<button class="button" onclick="showNewCharacters()">Персонажи</button>` : '';
-
       app.innerHTML = `
-        <div class="container fade-in">
+        <div class="container">
           <h1>${loc.title}</h1>
           <p>${loc.description}</p>
+
+          <!-- Изображение локации -->
           <div class="image-container">
             <div class="loading-indicator">Загрузка изображения...</div>
-            <img src="images/${loc.image}" class="location-image" onload="this.previousElementSibling.style.display='none'; this.style.opacity=1;" />
+            <img src="${locationImage.src}" class="location-image" />
           </div>
 
-          <!-- Меню действий -->
+          <!-- Характеристики -->
           <div class="card stats-card">
             <h3>Характеристики</h3>
             <div class="stats-grid">
-              ${Object.entries(selectedCharacter.stats).map(([k,v]) => `
-                <div class="stat-box">
-                  <label>${k}</label>
-                  <input type="number" value="${v}" onchange="updateStat('${k}', this.value)"/>
-                </div>
-              `).join('')}
-            </div>
-            <div style="margin-top: 1rem; display:flex; gap: 1rem; flex-wrap: wrap;">
-              <button class="button" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
-              <button class="button" onclick="rollDice()">Бросить кости</button>
-              <button class="button" onclick="openInventory()">Инвентарь</button>
-              <button class="button" onclick="openNotes()">Заметки</button>
-              ${extraButton}
+              ${Object.entries(selectedCharacter.stats)
+                .map(([k,v], i) => `
+                  <div class="stat-box">
+                    <label>${k}</label>
+                    <input type="number" value="${v}" onchange="updateStat('${k}', this.value)" />
+                  </div>
+                  ${i % 4 === 3 ? '<br>' : ''}
+                `).join('')
+              }
             </div>
           </div>
 
-          <!-- Навигация -->
+          <!-- Кнопки действий -->
+          <div class="action-buttons-row">
+            <button class="styled-button action-button" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
+            <button class="styled-button action-button" onclick="rollDice()">Бросить кости</button>
+            <button class="styled-button action-button" onclick="openInventory()">Инвентарь</button>
+            <button class="styled-button action-button" onclick="openNotes()">Заметки</button>
+          </div>
+
+          <!-- Навигационные кнопки -->
           <div class="navigation-buttons">
-            ${index > 0 ? `<button class="button" onclick="renderLocation(${index - 1})">Предыдущая локация</button>` : ''}
-            ${index < data.locations.locations.length - 1 ? `<button class="button" onclick="renderLocation(${index + 1})">Следующая локация</button>` : ''}
-            <button class="button" onclick="renderMainMenu()">Главное меню</button>
+            ${index > 0 ? `<button class="styled-button nav-button" onclick="renderLocation(${index - 1})">Предыдущая локация</button>` : ''}
+            ${index < data.locations.locations.length - 1 ? `<button class="styled-button nav-button" onclick="renderLocation(${index + 1})">Следующая локация</button>` : ''}
+          </div>
+
+          <!-- Кнопка главного меню -->
+          <div class="main-menu-button">
+            <button class="styled-button main-menu-btn" onclick="renderMainMenu()">Главное меню</button>
           </div>
         </div>
       `;
 
-      // Предзагрузка изображения локации
+      // Скрываем индикатор загрузки и показываем изображение
       const imgContainer = app.querySelector('.image-container');
-      if (imgContainer) {
-        const img = imgContainer.querySelector('img');
-        if (img && img.complete) {
-          imgContainer.querySelector('.loading-indicator').style.display = 'none';
-          img.style.opacity = 1;
-        } else {
-          imgContainer.querySelector('.loading-indicator').style.display = 'block';
-        }
+      const loadingIndicator = imgContainer.querySelector('.loading-indicator');
+      const image = imgContainer.querySelector('img');
+      if (image && loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+        image.classList.add('loaded');
       }
 
       // Анимация появления
       setTimeout(() => {
         app.classList.remove('fade-out');
-        app.classList.add('fade-in');
       }, 10);
     }, 300);
   };
 
   locationImage.onerror = () => {
-    app.innerHTML = `<div class="container"><p>Не удалось загрузить изображение локации</p></div>`;
+    app.innerHTML = `<div class="container"><p>Ошибка загрузки изображения локации</p></div>`;
   };
 }
 
@@ -212,10 +195,17 @@ function rollDice() {
   modal.innerHTML = `
     <div class="modal-content">
       <h3>Выберите кости</h3>
-      ${diceOptions.map(d => `<label><input type="checkbox" value="${d}"/> ${d}</label><br/>`).join('')}
-      <button class="button" onclick="performRoll(this)">Бросить</button>
+      <div class="dice-options">
+        ${diceOptions.map(d => `
+          <label class="checkbox-label">
+            <input type="checkbox" value="${d}"/>
+            <span class="checkmark">${d}</span>
+          </label>
+        `).join('')}
+      </div>
+      <button class="styled-button" onclick="performRoll(this)">Бросить</button>
       <div id="dice-result"></div>
-      <button class="button close-button" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
+      <button class="styled-button close-button" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
@@ -231,7 +221,7 @@ function performRoll(button) {
   button.nextElementSibling.innerHTML = `<p>Результат: ${results.join(', ')}</p>`;
 }
 
-// Инвентарь
+// Открытие инвентаря
 function openInventory() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -240,12 +230,12 @@ function openInventory() {
   modal.innerHTML = `
     <div class="modal-content">
       <h3>Инвентарь</h3>
-      <div id="inventory-list" style="max-height: 300px; overflow-y: auto;"></div>
-      <div style="margin-top: 1rem;">
-        <input type="text" id="new-item-input" placeholder="Новый предмет" style="width:70%; padding: 0.5rem;" />
-        <button class="button" onclick="addItem(inventoryItems)">Добавить</button>
+      <div id="inventory-list" style="max-height: 300px; overflow-y:auto;"></div>
+      <div class="input-group">
+        <input type="text" id="new-item-input" placeholder="Новый предмет" class="item-input" />
+        <button class="styled-button" onclick="addItem(inventoryItems)">Добавить</button>
       </div>
-      <button class="button close-button" id="close-inventory-btn" style="margin-top:1rem;">Закрыть</button>
+      <button class="styled-button close-button" onclick="closeModalAndSave(modal, inventoryItems)" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
@@ -253,40 +243,40 @@ function openInventory() {
 
   const listContainer = modal.querySelector('#inventory-list');
   renderInventoryList(inventoryItems, listContainer);
-
-  modal.querySelector('#add-item-btn').onclick = () => {
-    const input = modal.querySelector('#new-item-input');
-    const newItem = input.value.trim();
-    if (newItem !== '') {
-      inventoryItems.push(newItem);
-      input.value = '';
-      renderInventoryList(inventoryItems, listContainer);
-    }
-  };
-
-  modal.querySelector('#close-inventory-btn').onclick = () => {
-    selectedCharacter.inventory = inventoryItems;
-    localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
-    modal.remove();
-  };
 }
 
 function renderInventoryList(items, container) {
   container.innerHTML = '';
   items.forEach((item, index) => {
     const itemDiv = document.createElement('div');
-    itemDiv.style.marginBottom = '1rem';
+    itemDiv.className = 'inventory-item';
     itemDiv.innerHTML = `
-      <input type="text" value="${item}" onchange="items[${index}] = this.value" style="width: 80%; padding: 0.4rem;" />
-      <button class="button delete-item-btn" onclick="removeItem(${index}, items, this.closest('.modal-content'))">Удалить</button>
+      <input type="text" value="${item}" onchange="items[${index}] = this.value" />
+      <button class="styled-button small" onclick="removeItem(${index}, items, this.closest('.modal-content'))">Удалить</button>
     `;
     container.appendChild(itemDiv);
   });
 }
 
-function removeItem(index, items, container) {
+function addItem(items) {
+  const input = document.getElementById('new-item-input');
+  const newItem = input.value.trim();
+  if (newItem !== '') {
+    items.push(newItem);
+    input.value = '';
+    renderInventoryList(items, document.getElementById('inventory-list'));
+  }
+}
+
+function removeItem(index, items, modal) {
   items.splice(index, 1);
-  renderInventoryList(items, container.querySelector('#inventory-list'));
+  renderInventoryList(items, modal.querySelector('#inventory-list'));
+}
+
+function closeModalAndSave(modal, items) {
+  selectedCharacter.inventory = items;
+  localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
+  modal.remove();
 }
 
 // Заметки
@@ -298,31 +288,29 @@ function openNotes() {
   modal.innerHTML = `
     <div class="modal-content">
       <h3>Заметки</h3>
-      <input type="text" id="note-input" placeholder="Введите заметку..." style="width:90%; padding: 0.5rem; margin-bottom: 1rem;" />
-      <button class="button" id="add-note-btn">Добавить</button>
-      <div id="notes-list" style="max-height: 300px; overflow-y: auto; margin-top:1rem;"></div>
-      <button class="button close-button" id="close-notes-btn" style="margin-top:1rem;">Закрыть</button>
+      <div id="notes-list" style="max-height: 300px; overflow-y: auto;"></div>
+      <div class="input-group">
+        <input type="text" id="note-input" placeholder="Введите заметку..." class="item-input" />
+        <button class="styled-button" onclick="addNote(notes, this.closest('.modal-content'))">Добавить</button>
+      </div>
+      <button class="styled-button close-button" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 
   const listContainer = modal.querySelector('#notes-list');
+  const noteInput = modal.querySelector('#note-input');
+
   renderNotesList(notes, listContainer);
 
-  modal.querySelector('#add-note-btn').onclick = () => {
-    const text = modal.querySelector('#note-input').value.trim();
+  modal.querySelector('.input-group .styled-button').onclick = () => {
+    const text = noteInput.value.trim();
     if (text) {
       notes.push(text);
-      modal.querySelector('#note-input').value = '';
+      noteInput.value = '';
       renderNotesList(notes, listContainer);
     }
-  };
-
-  modal.querySelector('#close-notes-btn').onclick = () => {
-    selectedCharacter.notes = notes;
-    localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
-    modal.remove();
   };
 }
 
@@ -330,16 +318,23 @@ function renderNotesList(notes, container) {
   container.innerHTML = '';
   notes.forEach((note, index) => {
     const noteDiv = document.createElement('div');
-    noteDiv.style.marginBottom = '1rem';
+    noteDiv.className = 'note-item';
     noteDiv.innerHTML = `
-      <textarea rows="2" style="width:90%; padding: 0.4rem;">${note}</textarea>
-      <button class="button delete-note-btn" onclick="notes.splice(${index}, 1); renderNotesList(notes, this.closest('.modal-content').querySelector('#notes-list'))">Удалить</button>
+      <textarea rows="2" oninput="notes[${index}] = this.value">${note}</textarea>
+      <button class="styled-button small" onclick="notes.splice(${index}, 1); renderNotesList(notes, this.closest('#notes-list'))">Удалить</button>
     `;
-    noteDiv.querySelector('textarea').oninput = e => {
-      notes[index] = e.target.value;
-    };
     container.appendChild(noteDiv);
   });
+}
+
+function addNote(notes, modal) {
+  const input = modal.querySelector('#note-input');
+  const text = input.value.trim();
+  if (text) {
+    notes.push(text);
+    input.value = '';
+    renderNotesList(notes, modal.querySelector('#notes-list'));
+  }
 }
 
 // Открытие новых персонажей
@@ -353,19 +348,19 @@ function showNewCharacters() {
   modal.innerHTML = `
     <div class="modal-content" style="max-height:90vh; overflow-y:auto;">
       <h3>Появились новые персонажи</h3>
-      <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <div class="new-characters-container">
         ${newChars.map(char => `
-          <div class="card">
-            <div class="loading-indicator">Загрузка изображения...</div>
+          <div class="new-char-card">
+            <div class="loading-indicator">Загрузка...</div>
             <img src="images/${char.image}" class="character-image" onload="this.previousElementSibling.style.display='none'; this.style.opacity=1;" />
             <h3>${char.name}</h3>
             <p><strong>Класс:</strong> ${char.class}</p>
             <p>${char.description.substring(0, 100)}...</p>
-            <button class="button" onclick="switchCharacter('${char.id}')">Выбрать</button>
+            <button class="styled-button" onclick="switchCharacter('${char.id}')">Выбрать</button>
           </div>
         `).join('')}
       </div>
-      <button class="button close-button" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
+      <button class="styled-button close-button" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
