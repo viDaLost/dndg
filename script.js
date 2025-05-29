@@ -26,9 +26,6 @@ function renderMainMenu() {
 
 // Выбор персонажа
 function renderCharacterSelection() {
-  // Сбрасываем предыдущего персонажа
-  selectedCharacter = null;
-
   const html = `
     <div class="container">
       <h2>Выберите персонажа</h2>
@@ -36,13 +33,10 @@ function renderCharacterSelection() {
         .filter(char => !['korgreyv', 'porje'].includes(char.id))
         .map(char => `
         <div class="character-card">
-          <img src="images/${char.image}" class="character-image" onload="this.style.opacity=1;" />
-          <div class="character-info">
-            <h3>${char.name}</h3>
-            <p><strong>Класс:</strong> ${char.class}</p>
-            <p>${char.description.substring(0, 80)}...</p>
-            <button class="styled-button select-character-btn" onclick="selectCharacter('${char.id}')">Выбрать</button>
-          </div>
+          <img src="images/${char.image}" class="character-image loaded" />
+          <h3>${char.name}</h3>
+          <p><strong>Класс:</strong> ${char.class}</p>
+          <button class="styled-button select-character-btn" onclick="selectCharacter('${char.id}')">Выбрать</button>
         </div>
       `).join('')}
     </div>
@@ -95,32 +89,32 @@ function renderLocation(index) {
   const loc = data.locations.locations[index];
   if (!loc) return;
 
-  // Сохраняем индекс текущей локации
+  // Сохраняем текущую локацию
   currentLocationIndex = index;
   localStorage.setItem('currentLocationIndex', index);
 
-  // Фиксируем фон приложения
+  // Устанавливаем общий фон приложения
   document.body.style.background = '#2e2e2e';
   document.body.style.color = '#f5f5dc';
 
-  const extraButton = index === 4 ? `<button class="styled-button" onclick="showNewCharacters()">Персонажи</button>` : '';
-
-  // Предзагрузка изображения локации
+  // Предзагружаем изображение локации
   const locationImage = new Image();
   locationImage.src = `images/${loc.image}`;
   locationImage.onload = () => {
     app.classList.add('fade-out');
 
     setTimeout(() => {
+      const extraButton = index === 4 ? `<button class="styled-button action-button" onclick="showNewCharacters()">Персонажи</button>` : '';
+
       app.innerHTML = `
-        <div class="container">
+        <div class="container fade-in">
           <h1>${loc.title}</h1>
           <p>${loc.description}</p>
 
           <!-- Изображение локации -->
           <div class="image-container">
-            <div class="loading-indicator">Загрузка изображения...</div>
-            <img src="${locationImage.src}" class="location-image" />
+            <div class="loading-indicator">Загрузка...</div>
+            <img src="${locationImage.src}" class="location-image" onload="this.previousElementSibling.style.display='none'; this.style.opacity=1;" />
           </div>
 
           <!-- Характеристики -->
@@ -128,46 +122,39 @@ function renderLocation(index) {
             <h3>Характеристики</h3>
             <div class="stats-grid">
               ${Object.entries(selectedCharacter.stats)
-                .map(([k,v], i) => `
+                .map(([k, v], i) => `
                   <div class="stat-box">
                     <label>${k}</label>
                     <input type="number" value="${v}" onchange="updateStat('${k}', this.value)" />
                   </div>
                   ${i % 4 === 3 ? '<br>' : ''}
-                `).join('')
+                `)
+                .join('')
               }
             </div>
           </div>
 
-          <!-- Кнопки действий -->
+          <!-- Действия -->
           <div class="action-buttons-row">
             <button class="styled-button action-button" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
             <button class="styled-button action-button" onclick="rollDice()">Бросить кости</button>
             <button class="styled-button action-button" onclick="openInventory()">Инвентарь</button>
             <button class="styled-button action-button" onclick="openNotes()">Заметки</button>
+            ${extraButton}
           </div>
 
-          <!-- Навигационные кнопки -->
+          <!-- Навигация -->
           <div class="navigation-buttons">
             ${index > 0 ? `<button class="styled-button nav-button" onclick="renderLocation(${index - 1})">Предыдущая локация</button>` : ''}
             ${index < data.locations.locations.length - 1 ? `<button class="styled-button nav-button" onclick="renderLocation(${index + 1})">Следующая локация</button>` : ''}
           </div>
 
-          <!-- Кнопка главного меню -->
+          <!-- Главное меню -->
           <div class="main-menu-button">
             <button class="styled-button main-menu-btn" onclick="renderMainMenu()">Главное меню</button>
           </div>
         </div>
       `;
-
-      // Скрываем индикатор загрузки и показываем изображение
-      const imgContainer = app.querySelector('.image-container');
-      const loadingIndicator = imgContainer.querySelector('.loading-indicator');
-      const image = imgContainer.querySelector('img');
-      if (image && loadingIndicator) {
-        loadingIndicator.style.display = 'none';
-        image.classList.add('loaded');
-      }
 
       // Анимация появления
       setTimeout(() => {
@@ -198,7 +185,7 @@ function rollDice() {
       <div class="dice-options">
         ${diceOptions.map(d => `
           <label class="checkbox-label">
-            <input type="checkbox" value="${d}"/>
+            <input type="checkbox" value="${d}" />
             <span class="checkmark">${d}</span>
           </label>
         `).join('')}
@@ -221,7 +208,7 @@ function performRoll(button) {
   button.nextElementSibling.innerHTML = `<p>Результат: ${results.join(', ')}</p>`;
 }
 
-// Открытие инвентаря
+// Инвентарь
 function openInventory() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -233,7 +220,7 @@ function openInventory() {
       <div id="inventory-list" style="max-height: 300px; overflow-y:auto;"></div>
       <div class="input-group">
         <input type="text" id="new-item-input" placeholder="Новый предмет" class="item-input" />
-        <button class="styled-button" onclick="addItem(inventoryItems)">Добавить</button>
+        <button class="styled-button small" onclick="addItem(inventoryItems)">Добавить</button>
       </div>
       <button class="styled-button close-button" onclick="closeModalAndSave(modal, inventoryItems)" style="margin-top:1rem;">Закрыть</button>
     </div>
@@ -288,10 +275,10 @@ function openNotes() {
   modal.innerHTML = `
     <div class="modal-content">
       <h3>Заметки</h3>
-      <div id="notes-list" style="max-height: 300px; overflow-y: auto;"></div>
+      <div id="notes-list" style="max-height: 300px; overflow-y:auto;"></div>
       <div class="input-group">
         <input type="text" id="note-input" placeholder="Введите заметку..." class="item-input" />
-        <button class="styled-button" onclick="addNote(notes, this.closest('.modal-content'))">Добавить</button>
+        <button class="styled-button small" onclick="addNote(notes, this.closest('.modal-content'))">Добавить</button>
       </div>
       <button class="styled-button close-button" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
     </div>
@@ -299,17 +286,15 @@ function openNotes() {
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 
-  const listContainer = modal.querySelector('#notes-list');
-  const noteInput = modal.querySelector('#note-input');
+  renderNotesList(notes, modal.querySelector('#notes-list'));
 
-  renderNotesList(notes, listContainer);
-
-  modal.querySelector('.input-group .styled-button').onclick = () => {
-    const text = noteInput.value.trim();
+  modal.querySelector('.input-group .small').onclick = () => {
+    const input = modal.querySelector('#note-input');
+    const text = input.value.trim();
     if (text) {
       notes.push(text);
-      noteInput.value = '';
-      renderNotesList(notes, listContainer);
+      input.value = '';
+      renderNotesList(notes, modal.querySelector('#notes-list'));
     }
   };
 }
