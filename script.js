@@ -30,7 +30,7 @@ function renderCharacterSelection() {
     <div class="container">
       <h2>Выберите персонажа</h2>
       ${data.characters.characters
-        .filter(char => !['korgreyv', 'porje', 'andrey'].includes(char.id))
+        .filter(char => !['korgreyv', 'porje', 'andrey'].includes(char.id.toString()))
         .map(char => `
         <div class="card">
           <img src="images/${char.image}" class="character-image" onclick="showCharacterCard('${char.id}')"/>
@@ -46,7 +46,9 @@ function renderCharacterSelection() {
 
 // Карточка персонажа
 function showCharacterCard(id) {
-  const char = data.characters.characters.find(c => c.id === id);
+  const char = data.characters.characters.find(c => c.id.toString() === id.toString());
+  if (!char) return;
+
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.innerHTML = `
@@ -70,16 +72,14 @@ function showCharacterCard(id) {
 
 // Выбор персонажа
 function selectCharacter(id) {
-  const character = data.characters.characters.find(c => c.id === id);
+  const character = data.characters.characters.find(c => c.id.toString() === id.toString());
   if (!character) return;
 
-  // Сохраняем выбранного персонажа
   selectedCharacter = JSON.parse(JSON.stringify(character));
   localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
   localStorage.setItem('currentLocationIndex', 0);
   currentLocationIndex = 0;
 
-  // Переход к первой локации
   renderLocation(currentLocationIndex);
 }
 
@@ -88,6 +88,7 @@ function renderLocation(index) {
   const loc = data.locations.locations[index];
   if (!loc) return;
 
+  // Сохраняем индекс текущей локации
   currentLocationIndex = index;
   localStorage.setItem('currentLocationIndex', index);
 
@@ -229,7 +230,7 @@ function openNotes() {
       <h3>Заметки</h3>
       <input type="text" id="note-input" placeholder="Введите заметку..." style="width:90%; padding:0.5rem; margin-bottom:1rem;" />
       <button class="button" id="add-note-btn">Добавить</button>
-      <div id="notes-list" style="max-height: 300px; overflow-y: auto; margin-top: 1rem;"></div>
+      <div id="notes-list" style="max-height: 300px; overflow-y: auto; margin-top:1rem;"></div>
       <button class="button close-button" id="close-notes-btn" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
@@ -266,12 +267,14 @@ function renderNotesList(notes, container) {
       <textarea rows="2" style="width:90%; padding:0.4rem;">${note}</textarea>
       <button class="button delete-note-btn" onclick="notes.splice(${index}, 1); renderNotesList(notes, this.closest('#notes-list'))">Удалить</button>
     `;
-    noteDiv.querySelector('textarea').oninput = e => notes[index] = e.target.value;
+    noteDiv.querySelector('textarea').oninput = e => {
+      notes[index] = e.target.value;
+    };
     container.appendChild(noteDiv);
   });
 }
 
-// Открытие нового экрана с персонажами
+// Открытие новых персонажей
 function showNewCharacters() {
   const newChars = ['korgreyv', 'porje']
     .map(id => data.characters.characters.find(c => c.id === id))
@@ -302,14 +305,14 @@ function showNewCharacters() {
   modal.style.display = 'flex';
 }
 
-// Смена персонажа
+// Переключение между персонажами
 function switchCharacter(newCharId) {
   const newChar = data.characters.characters.find(c => c.id === newCharId);
   if (!newChar) return;
 
   selectedCharacter = newChar;
   localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
-  localStorage.setItem('lastReplacedCharacterId', selectedCharacter.id);
+
   document.querySelector('.modal').style.display = 'none';
   renderLocation(currentLocationIndex);
 }
