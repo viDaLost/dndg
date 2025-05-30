@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel :wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel     :wght@400;700&display=swap');
 
 * {
   box-sizing: border-box;
@@ -10,7 +10,6 @@
 body {
   background: #1a1a1a;
   color: #f5f5dc;
-  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -24,7 +23,6 @@ body {
   border-radius: 10px;
   padding: 1rem;
   margin: 1rem 0;
-  transition: all 0.3s ease;
 }
 
 .character-image,
@@ -32,110 +30,31 @@ body {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
 }
 
-.character-image.loaded,
-.location-image.loaded {
-  opacity: 1;
-}
-
-/* Красивые стилизованные кнопки */
-.styled-button {
-  background-color: #8b5e3c;
+.button {
+  background: #8b5e3c;
   color: white;
-  padding: 0.75rem 1.2rem;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
+  margin: 0.5rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
 }
 
-.styled-button.small {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  min-width: 90px;
+.button:hover {
+  background: #a96c4b;
 }
 
-.styled-button:hover {
-  background-color: #a96c4b;
-  transform: scale(1.02);
-}
-
-.styled-button.close-modal-btn {
-  background-color: #ff4b5c;
-}
-
-/* Сетка характеристик — 2 строки по 4 поля */
-.stats-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.stat-box {
-  flex: 1 1 45%;
-  min-width: 120px;
-  background-color: #3a3a5a;
-  padding: 0.8rem;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.stat-box label {
-  font-weight: bold;
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.stat-box input {
-  width: 60px;
-  padding: 0.3rem;
-  border-radius: 4px;
-  border: none;
-  font-size: 1rem;
-  text-align: center;
-  background: #2e1f0f;
-  color: white;
-}
-
-/* Кнопки действий в одной строке */
-.action-buttons-row {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  margin-top: 1.5rem;
-}
-
-@media (max-width: 600px) {
-  .action-buttons-row {
-    flex-wrap: wrap;
-  }
-
-  .action-buttons-row .styled-button {
-    flex: 1 1 100%;
-    min-width: 100%;
-    margin-bottom: 0.5rem;
-  }
-
-  .stat-box {
-    flex: 1 1 45%;
-    min-width: 45%;
-  }
-}
-
-/* Всплывающее окно */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.8);
   display: none;
   justify-content: center;
   align-items: center;
@@ -150,94 +69,56 @@ body {
   max-height: 90%;
   overflow-y: auto;
   text-align: center;
-  animation: fadeIn 0.3s ease forwards;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.stats-card {
+  margin-top: 1rem;
 }
 
-/* Кнопка "Показать персонажей" в Коллегии магов */
-.new-characters-container {
-  display: flex;
-  flex-direction: column;
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 1rem;
 }
 
-.new-char-card {
-  background: #3a3a5a;
-  border-radius: 10px;
+.stat-box {
+  background-color: #3a3a5a;
   padding: 1rem;
+  border-radius: 8px;
   text-align: center;
 }
 
-.new-char-card img {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.stat-box label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
-.new-char-card img.loaded {
-  opacity: 1;
+.stat-box input {
+  width: 60px;
+  padding: 0.3rem;
+  text-align: center;
+  border-radius: 4px;
+  border: none;
+  font-size: 1rem;
 }
 
-/* Анимация между локациями */
-.fade-out {
-  opacity: 0;
-  transition: opacity 0.4s ease-in-out;
-}
-
-.fade-in {
-  opacity: 1;
-  transition: opacity 0.4s ease-in-out;
-}
-
-/* Индикатор загрузки изображения */
-.image-container {
-  position: relative;
-  width: 100%;
-  margin: 1rem 0;
-}
-
-.loading-indicator {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #ccc;
-  font-size: 0.9rem;
-  z-index: 2;
-}
-
-.location-image.loaded {
-  opacity: 1;
-}
-
-/* Навигационные кнопки */
 .navigation-buttons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  justify-content: center;
-}
-
-.nav-button {
-  flex: 1 1 48%;
-  min-width: 48%;
-}
-
-/* Главная кнопка "Главное меню" */
-.main-menu-button {
   margin-top: 1.5rem;
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
-.main-menu-btn {
-  width: 100%;
-  max-width: 300px;
+.close-button {
   background-color: #ff4b5c;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .button {
+    width: 100%;
+    font-size: 1rem;
+  }
 }
