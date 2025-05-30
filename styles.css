@@ -1,104 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel :wght@400;700&display=swap');
-
-* {
-  box-sizing: border-box;
-  font-family: 'Cinzel', serif;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background: #1a1a1a;
-  color: #f5f5dc;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-.card {
-  background: #2e1f0f;
-  border-radius: 10px;
-  padding: 1rem;
-  margin: 1rem 0;
-  transition: all 0.3s ease;
-}
-
-.character-image,
-.location-image {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-}
-
-.character-image.loaded,
-.location-image.loaded {
-  opacity: 1;
-}
-
-/* Красивые кнопки */
-.styled-button {
-  background-color: #8b5e3c;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-.styled-button:hover {
-  background-color: #a96c4b;
-  transform: scale(1.02);
-}
-
-.styled-button.close-button {
-  background-color: #ff4b5c;
-}
-
-/* Модальное окно */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: #2e1f0f;
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  text-align: center;
-  animation: fadeIn 0.3s ease forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 /* Характеристики в 2 строки по 4 поля */
 .stats-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  justify-content: space-between;
 }
 
 .stat-box {
@@ -131,7 +35,8 @@ body {
 .action-buttons-row {
   display: flex;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  justify-content: space-between;
   margin-top: 1.5rem;
 }
 
@@ -146,7 +51,7 @@ body {
   display: flex;
   gap: 1rem;
   margin-top: 1.5rem;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .nav-button {
@@ -184,6 +89,11 @@ body {
   z-index: 2;
 }
 
+.location-image.loaded {
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
+
 /* Анимация перехода между локациями */
 .fade-out {
   opacity: 0;
@@ -198,8 +108,8 @@ body {
 /* Responsive стили для мобильных устройств */
 @media (max-width: 600px) {
   .action-buttons-row .styled-button {
-    flex: 1 1 48%;
-    min-width: 48%;
+    flex: 1 1 22%;
+    min-width: 22%;
     font-size: 0.9rem;
   }
 
