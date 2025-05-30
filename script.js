@@ -30,13 +30,15 @@ function renderCharacterSelection() {
     <div class="container">
       <h2>Выберите персонажа</h2>
       ${data.characters.characters
-        .filter(char => !['korgreyv', 'porje'].includes(char.id))
+        .filter(char => !['korgreyv', 'porje', 'andrey'].includes(char.id.toString()))
         .map(char => `
-        <div class="card">
-          <img src="images/${char.image}" class="character-image" onload="this.style.opacity=1;" />
-          <h3>${char.name}</h3>
-          <p><strong>Класс:</strong> ${char.class}</p>
-          <button class="styled-button" onclick="selectCharacter('${char.id}')">Выбрать</button>
+        <div class="character-card">
+          <img src="images/${char.image}" class="character-image" onload="this.classList.add('loaded')"/>
+          <div class="character-info">
+            <h3>${char.name}</h3>
+            <p><strong>Класс:</strong> ${char.class}</p>
+            <button class="styled-button" onclick="selectCharacter('${char.id}')">Выбрать</button>
+          </div>
         </div>
       `).join('')}
     </div>
@@ -54,7 +56,7 @@ function showCharacterCard(id) {
   modal.innerHTML = `
     <div class="modal-content">
       <h2>${char.name}</h2>
-      <img src="images/${char.image}" class="character-image loaded" />
+      <img src="images/${char.image}" class="character-image loaded"/>
       <p><strong>Класс:</strong> ${char.class}</p>
       <p><strong>Описание:</strong> ${char.description}</p>
       <h4>Характеристики:</h4>
@@ -72,7 +74,7 @@ function showCharacterCard(id) {
 
 // Выбор персонажа
 function selectCharacter(id) {
-  const character = data.characters.characters.find(c => c.id === id);
+  const character = data.characters.characters.find(c => c.id.toString() === id.toString());
   if (!character) return;
 
   selectedCharacter = JSON.parse(JSON.stringify(character));
@@ -97,7 +99,7 @@ function renderLocation(index) {
     localStorage.setItem('currentLocationIndex', index);
 
     // Фиксируем фон приложения
-    document.body.style.background = '#2e1f0f';
+    document.body.style.background = '#2e2e2e';
     document.body.style.color = '#f5f5dc';
 
     // Добавляем контент
@@ -107,13 +109,13 @@ function renderLocation(index) {
       <div class="container">
         <h1>${loc.title}</h1>
         <p>${loc.description}</p>
-
+        
         <!-- Изображение локации -->
         <div class="image-container">
           <div class="loading-indicator">Загрузка...</div>
           <img src="images/${loc.image}" class="location-image" onload="this.previousElementSibling.style.display='none'; this.classList.add('loaded')" />
         </div>
-
+        
         <!-- Характеристики -->
         <div class="card stats-card">
           <h3>Характеристики</h3>
@@ -318,8 +320,8 @@ function showNewCharacters() {
       <div class="new-characters">
         ${newChars.map(char => `
           <div class="new-char-card">
-            <div class="loading-indicator">Загрузка...</div>
             <img src="images/${char.image}" class="character-image" onload="this.previousElementSibling.style.display='none'; this.classList.add('loaded')" />
+            <div class="loading-indicator">Загрузка...</div>
             <h3>${char.name}</h3>
             <p><strong>Класс:</strong> ${char.class}</p>
             <p>${char.description.substring(0, 100)}...</p>
