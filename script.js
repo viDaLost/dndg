@@ -30,15 +30,13 @@ function renderCharacterSelection() {
     <div class="container">
       <h2>Выберите персонажа</h2>
       ${data.characters.characters
-        .filter(char => !['korgreyv', 'porje', 'andrey'].includes(char.id.toString()))
+        .filter(char => !['korgreyv', 'porje'].includes(char.id))
         .map(char => `
-        <div class="character-card">
-          <img src="images/${char.image}" class="character-image" onload="this.classList.add('loaded')"/>
-          <div class="character-info">
-            <h3>${char.name}</h3>
-            <p><strong>Класс:</strong> ${char.class}</p>
-            <button class="styled-button" onclick="selectCharacter('${char.id}')">Выбрать</button>
-          </div>
+        <div class="card">
+          <img src="images/${char.image}" class="character-image" onload="this.style.opacity=1;" />
+          <h3>${char.name}</h3>
+          <p><strong>Класс:</strong> ${char.class}</p>
+          <button class="styled-button small" onclick="selectCharacter('${char.id}')">Выбрать</button>
         </div>
       `).join('')}
     </div>
@@ -56,7 +54,7 @@ function showCharacterCard(id) {
   modal.innerHTML = `
     <div class="modal-content">
       <h2>${char.name}</h2>
-      <img src="images/${char.image}" class="character-image loaded"/>
+      <img src="images/${char.image}" class="character-image loaded" />
       <p><strong>Класс:</strong> ${char.class}</p>
       <p><strong>Описание:</strong> ${char.description}</p>
       <h4>Характеристики:</h4>
@@ -65,7 +63,7 @@ function showCharacterCard(id) {
       <ul>${char.inventory.map(i => `<li>${i}</li>`).join('')}</ul>
       <h4>Способности:</h4>
       <ul>${char.abilities.map(a => `<li>${a}</li>`).join('')}</ul>
-      <button class="styled-button close-modal-btn" onclick="this.closest('.modal').style.display='none'">Закрыть</button>
+      <button class="styled-button small close-modal-btn" onclick="this.closest('.modal').style.display='none'">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
@@ -74,7 +72,7 @@ function showCharacterCard(id) {
 
 // Выбор персонажа
 function selectCharacter(id) {
-  const character = data.characters.characters.find(c => c.id.toString() === id.toString());
+  const character = data.characters.characters.find(c => c.id === id);
   if (!character) return;
 
   selectedCharacter = JSON.parse(JSON.stringify(character));
@@ -90,7 +88,7 @@ function renderLocation(index) {
   const loc = data.locations.locations[index];
   if (!loc) return;
 
-  // Анимация
+  // Анимация перехода
   app.classList.add('fade-out');
 
   setTimeout(() => {
@@ -98,24 +96,23 @@ function renderLocation(index) {
     currentLocationIndex = index;
     localStorage.setItem('currentLocationIndex', index);
 
-    // Фиксируем фон приложения
+    // Фиксируем фон приложения как серый
     document.body.style.background = '#2e2e2e';
     document.body.style.color = '#f5f5dc';
 
-    // Добавляем контент
-    const extraButton = index === 4 ? `<button class="styled-button" onclick="showNewCharacters()">Персонажи</button>` : '';
+    const extraButton = index === 4 ? `<button class="styled-button small" onclick="showNewCharacters()">Показать персонажей</button>` : '';
 
     app.innerHTML = `
       <div class="container">
         <h1>${loc.title}</h1>
         <p>${loc.description}</p>
-        
+
         <!-- Изображение локации -->
         <div class="image-container">
-          <div class="loading-indicator">Загрузка...</div>
+          <div class="loading-indicator">Загрузка изображения...</div>
           <img src="images/${loc.image}" class="location-image" onload="this.previousElementSibling.style.display='none'; this.classList.add('loaded')" />
         </div>
-        
+
         <!-- Характеристики -->
         <div class="card stats-card">
           <h3>Характеристики</h3>
@@ -132,16 +129,16 @@ function renderLocation(index) {
 
         <!-- Кнопки действий -->
         <div class="action-buttons-row">
-          <button class="styled-button action-btn" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
-          <button class="styled-button action-btn" onclick="rollDice()">Бросить кости</button>
-          <button class="styled-button action-btn" onclick="openInventory()">Инвентарь</button>
-          <button class="styled-button action-btn" onclick="openNotes()">Заметки</button>
+          <button class="styled-button small action-btn" onclick="showCharacterCard(selectedCharacter.id)">Показать карточку</button>
+          <button class="styled-button small action-btn" onclick="rollDice()">Бросить кости</button>
+          <button class="styled-button small action-btn" onclick="openInventory()">Инвентарь</button>
+          <button class="styled-button small action-btn" onclick="openNotes()">Заметки</button>
         </div>
 
         <!-- Навигация -->
         <div class="navigation-buttons">
-          ${index > 0 ? `<button class="styled-button nav-btn" onclick="renderLocation(${index - 1})">Предыдущая локация</button>` : ''}
-          ${index < data.locations.locations.length - 1 ? `<button class="styled-button nav-btn" onclick="renderLocation(${index + 1})">Следующая локация</button>` : ''}
+          ${index > 0 ? `<button class="styled-button small nav-btn" onclick="renderLocation(${index - 1})">Предыдущая локация</button>` : ''}
+          ${index < data.locations.locations.length - 1 ? `<button class="styled-button small nav-btn" onclick="renderLocation(${index + 1})">Следующая локация</button>` : ''}
         </div>
 
         <!-- Главное меню -->
@@ -151,7 +148,7 @@ function renderLocation(index) {
       </div>
     `;
 
-    // Анимация появления
+    // Убираем анимацию
     setTimeout(() => {
       app.classList.remove('fade-out');
       app.classList.add('fade-in');
@@ -174,9 +171,9 @@ function rollDice() {
     <div class="modal-content">
       <h3>Выберите кости</h3>
       ${diceOptions.map(d => `<label><input type="checkbox" value="${d}"/> ${d}</label><br/>`).join('')}
-      <button class="styled-button" onclick="performRoll(this)">Бросить</button>
+      <button class="styled-button small" onclick="performRoll(this)">Бросить</button>
       <div id="dice-result"></div>
-      <button class="styled-button close-modal-btn" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
+      <button class="styled-button small close-modal-btn" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
@@ -204,11 +201,12 @@ function openInventory() {
       <div id="inventory-list" style="max-height: 300px; overflow-y: auto;"></div>
       <div class="input-group">
         <input type="text" id="new-item-input" placeholder="Новый предмет" class="item-input" />
-        <button class="styled-button" onclick="addItem(inventoryItems)">Добавить</button>
+        <button class="styled-button small" onclick="addItem(inventoryItems)">Добавить</button>
       </div>
-      <button class="styled-button close-modal-btn" onclick="closeModalAndSave(modal, inventoryItems)" style="margin-top:1rem;">Закрыть</button>
+      <button class="styled-button small close-modal-btn" onclick="closeModalAndSave(modal, inventoryItems)" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
+
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 
@@ -223,7 +221,7 @@ function renderInventoryList(items, container) {
     itemDiv.className = 'inventory-item';
     itemDiv.innerHTML = `
       <input type="text" value="${item}" onchange="items[${index}] = this.value" />
-      <button class="styled-button small" onclick="removeItem(${index}, items, this.closest('.modal-content'))">Удалить</button>
+      <button class="styled-button small delete-btn" onclick="removeItem(${index}, items, this.closest('.modal-content'))">Удалить</button>
     `;
     container.appendChild(itemDiv);
   });
@@ -262,11 +260,12 @@ function openNotes() {
       <div id="notes-list" style="max-height: 300px; overflow-y: auto;"></div>
       <div class="input-group">
         <input type="text" id="note-input" placeholder="Введите заметку..." class="item-input" />
-        <button class="styled-button" onclick="addNote(notes, this.closest('.modal-content'))">Добавить</button>
+        <button class="styled-button small" onclick="addNote(notes, this.closest('.modal-content'))">Добавить</button>
       </div>
-      <button class="styled-button close-modal-btn" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
+      <button class="styled-button small close-modal-btn" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
+
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 
@@ -290,7 +289,7 @@ function renderNotesList(notes, container) {
     noteDiv.className = 'note-item';
     noteDiv.innerHTML = `
       <textarea rows="2" oninput="notes[${index}] = this.value">${note}</textarea>
-      <button class="styled-button small" onclick="notes.splice(${index}, 1); renderNotesList(notes, this.closest('#notes-list'))">Удалить</button>
+      <button class="styled-button small delete-btn" onclick="notes.splice(${index}, 1); renderNotesList(notes, this.closest('#notes-list'))">Удалить</button>
     `;
     container.appendChild(noteDiv);
   });
@@ -320,16 +319,15 @@ function showNewCharacters() {
       <div class="new-characters">
         ${newChars.map(char => `
           <div class="new-char-card">
-            <img src="images/${char.image}" class="character-image" onload="this.previousElementSibling.style.display='none'; this.classList.add('loaded')" />
-            <div class="loading-indicator">Загрузка...</div>
+            <img src="images/${char.image}" class="character-image" onload="this.style.opacity=1;" />
             <h3>${char.name}</h3>
             <p><strong>Класс:</strong> ${char.class}</p>
             <p>${char.description.substring(0, 100)}...</p>
-            <button class="styled-button" onclick="switchCharacter('${char.id}')">Выбрать</button>
+            <button class="styled-button small" onclick="switchCharacter('${char.id}')">Выбрать</button>
           </div>
         `).join('')}
       </div>
-      <button class="styled-button close-modal-btn" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
+      <button class="styled-button small close-modal-btn" onclick="this.closest('.modal').style.display='none'" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
