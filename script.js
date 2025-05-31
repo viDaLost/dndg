@@ -66,8 +66,6 @@ function renderLocation(index) {
   currentLocationIndex = index;
   localStorage.setItem('currentLocationIndex', index);
 
-  const extraButton = index === 4 ? `<button class="button small-button" onclick="showNewCharacters()">Персонажи</button>` : '';
-
   fadeTransition(() => {
     app.innerHTML = `
       <div class="container">
@@ -90,11 +88,10 @@ function renderLocation(index) {
           <button class="button small-button" onclick="rollDice()">Кости</button>
           <button class="button small-button" onclick="openInventory()">Инвентарь</button>
           <button class="button small-button" onclick="openNotes()">Заметки</button>
-          ${extraButton}
         </div>
         <div class="navigation-buttons">
-          ${index > 0 ? `<button class="button small-button" onclick="renderLocation(${index - 1})">←</button>` : ''}
-          ${index < data.locations.locations.length - 1 ? `<button class="button small-button" onclick="renderLocation(${index + 1})">→</button>` : ''}
+          ${index > 0 ? `<button class="button small-button" onclick="renderLocation(${index - 1})">Предыдущая локация</button>` : ''}
+          ${index < data.locations.locations.length - 1 ? `<button class="button small-button" onclick="renderLocation(${index + 1})">Следующая локация</button>` : ''}
         </div>
         <div style="text-align:center; margin-top: 0.5rem;">
           <button class="button small-button" onclick="renderMainMenu()">Главное меню</button>
@@ -117,48 +114,67 @@ function rollDice() {
     <div class="modal-content">
       <h3>Выберите кости</h3>
       <div>${dice.map(d => `<label><input type="checkbox" value="${d}"> ${d}</label>`).join('<br/>')}</div>
-      <button class="button small-button" onclick="performRoll(this)">Бросить</button>
+      <button class="button small-button" id="roll-button">Бросить</button>
       <div id="dice-result" style="margin-top:1rem;"></div>
-      <button class="button small-button" style="margin-top:1rem;" onclick="modal.remove()">Закрыть</button>
+      <button class="button small-button" id="close-dice" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
   modal.style.display = 'flex';
-}
 
-function performRoll(button) {
-  const selected = [...document.querySelectorAll('input[type=checkbox]:checked')];
-  const result = selected.map(input => {
-    const sides = parseInt(input.value.slice(1));
-    return `${input.value}: ${Math.floor(Math.random() * sides) + 1}`;
-  });
-  button.nextElementSibling.innerHTML = `<strong>Результаты:</strong><br>${result.join('<br>')}`;
+  modal.querySelector('#roll-button').onclick = () => {
+    const selected = [...modal.querySelectorAll('input[type=checkbox]:checked')];
+    const result = selected.map(input => {
+      const sides = parseInt(input.value.slice(1));
+      return `${input.value}: ${Math.floor(Math.random() * sides) + 1}`;
+    });
+    modal.querySelector('#dice-result').innerHTML = `<strong>Результаты:</strong><br>${result.join('<br>')}`;
+  };
+
+  modal.querySelector('#close-dice').onclick = () => modal.remove();
 }
 
 function openInventory() {
   const modal = document.createElement('div');
   modal.className = 'modal';
   let items = [...selectedCharacter.inventory];
+  modal.innerHTML = `
+    <div class="modal-content">
+      <h3>Инвентарь</h3>
+      <div id="inventory-items"></div>
+      <input type="text" id="new-item" placeholder="Новый предмет"/>
+      <button class="button small-button" id="add-item">Добавить</button>
+      <button class="button small-button" style="margin-top:1rem;" id="close-inv">Закрыть</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  const list = modal.querySelector('#inventory-items');
+
   function renderItems() {
-    const container = modal.querySelector('#inventory-items');
-    container.innerHTML = items.map((item, i) => `
+    list.innerHTML = items.map((item, i) => `
       <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
         <input type="text" value="${item}" onchange="items[${i}] = this.value" />
         <button class="button small-button" onclick="items.splice(${i}, 1); renderItems()">Удалить</button>
       </div>
     `).join('');
   }
-  modal.innerHTML = `
-    <div class="modal-content">
-      <h3>Инвентарь</h3>
-      <div id="inventory-items"></div>
-      <input type="text" id="new-item" placeholder="Новый предмет"/>
-      <button class="button small-button" onclick="const val=document.getElementById('new-item').value;if(val){items.push(val);document.getElementById('new-item').value='';renderItems()}">Добавить</button>
-      <button class="button small-button" style="margin-top:1rem;" onclick="selectedCharacter.inventory=items;localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter)); modal.remove()">Закрыть</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
+
   renderItems();
+
+  modal.querySelector('#add-item').onclick = () => {
+    const val = modal.querySelector('#new-item').value.trim();
+    if (val) {
+      items.push(val);
+      modal.querySelector('#new-item').value = '';
+      renderItems();
+    }
+  };
+
+  modal.querySelector('#close-inv').onclick = () => {
+    selectedCharacter.inventory = items;
+    localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
+    modal.remove();
+  };
   modal.style.display = 'flex';
 }
 
@@ -166,29 +182,47 @@ function openNotes() {
   const modal = document.createElement('div');
   modal.className = 'modal';
   let notes = selectedCharacter.notes || [];
-  function renderNotes() {
-    const container = modal.querySelector('#notes-list');
-    container.innerHTML = notes.map((note, i) => `
-      <div>
-        <textarea rows="2">${note}</textarea>
-        <button class="button small-button" onclick="notes.splice(${i},1);renderNotes()">Удалить</button>
-      </div>
-    `).join('');
-    [...container.querySelectorAll('textarea')].forEach((ta, i) => {
-      ta.oninput = e => notes[i] = e.target.value;
-    });
-  }
   modal.innerHTML = `
     <div class="modal-content">
       <h3>Заметки</h3>
-      <input type="text" id="new-note" placeholder="Новая заметка" />
-      <button class="button small-button" onclick="const val=document.getElementById('new-note').value;if(val){notes.push(val);document.getElementById('new-note').value='';renderNotes()}">Добавить</button>
+      <input type="text" id="new-note" placeholder="Новая заметка"/>
+      <button class="button small-button" id="add-note">Добавить</button>
       <div id="notes-list" style="margin-top:1rem;"></div>
-      <button class="button small-button" style="margin-top:1rem;" onclick="selectedCharacter.notes=notes;localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter)); modal.remove()">Закрыть</button>
+      <button class="button small-button" id="close-notes" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
+
+  const list = modal.querySelector('#notes-list');
+
+  function renderNotes() {
+    list.innerHTML = notes.map((note, i) => `
+      <div>
+        <textarea rows="2">${note}</textarea>
+        <button class="button small-button" onclick="notes.splice(${i}, 1); renderNotes()">Удалить</button>
+      </div>
+    `).join('');
+    [...list.querySelectorAll('textarea')].forEach((ta, i) => {
+      ta.oninput = e => notes[i] = e.target.value;
+    });
+  }
+
   renderNotes();
+
+  modal.querySelector('#add-note').onclick = () => {
+    const val = modal.querySelector('#new-note').value.trim();
+    if (val) {
+      notes.push(val);
+      modal.querySelector('#new-note').value = '';
+      renderNotes();
+    }
+  };
+
+  modal.querySelector('#close-notes').onclick = () => {
+    selectedCharacter.notes = notes;
+    localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
+    modal.remove();
+  };
   modal.style.display = 'flex';
 }
 
