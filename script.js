@@ -3,6 +3,7 @@ let selectedCharacter = null;
 let currentLocationIndex = 0;
 document.body.style.backgroundColor = '#808080';
 
+// Загрузка данных
 async function loadData() {
   const [charsRes, locsRes] = await Promise.all([
     fetch('characters.json'),
@@ -14,6 +15,7 @@ async function loadData() {
   };
 }
 
+// Плавный переход
 function fadeTransition(callback) {
   app.style.opacity = 0;
   setTimeout(() => {
@@ -22,6 +24,7 @@ function fadeTransition(callback) {
   }, 300);
 }
 
+// Главное меню
 function renderMainMenu() {
   app.innerHTML = `
     <div class="container" style="text-align:center;">
@@ -31,6 +34,7 @@ function renderMainMenu() {
   `;
 }
 
+// Выбор персонажа
 function renderCharacterSelection() {
   const html = `
     <div class="container">
@@ -50,6 +54,7 @@ function renderCharacterSelection() {
   app.innerHTML = html;
 }
 
+// Сохранение выбранного персонажа
 function selectCharacter(id) {
   const character = data.characters.characters.find(c => c.id.toString() === id.toString());
   if (!character) return;
@@ -60,11 +65,16 @@ function selectCharacter(id) {
   renderLocation(currentLocationIndex);
 }
 
+// Отображение локации
 function renderLocation(index) {
   const loc = data.locations.locations[index];
   if (!loc) return;
   currentLocationIndex = index;
   localStorage.setItem('currentLocationIndex', index);
+
+  const showNewButton = loc.title.toLowerCase().includes("коллегия магов")
+    ? `<button class="button small-button" onclick="showNewCharacters()">Показать персонажей</button>`
+    : '';
 
   fadeTransition(() => {
     app.innerHTML = `
@@ -88,6 +98,7 @@ function renderLocation(index) {
           <button class="button small-button" onclick="rollDice()">Кости</button>
           <button class="button small-button" onclick="openInventory()">Инвентарь</button>
           <button class="button small-button" onclick="openNotes()">Заметки</button>
+          ${showNewButton}
         </div>
         <div class="navigation-buttons">
           ${index > 0 ? `<button class="button small-button" onclick="renderLocation(${index - 1})">Предыдущая локация</button>` : ''}
@@ -101,11 +112,74 @@ function renderLocation(index) {
   });
 }
 
+// Обновление характеристик
 function updateStat(stat, value) {
   selectedCharacter.stats[stat] = parseInt(value);
   localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
 }
 
+// Карточка персонажа
+function showCharacterCard(id) {
+  const char = data.characters.characters.find(c => c.id.toString() === id.toString());
+  if (!char) return;
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <h2>${char.name}</h2>
+      <img src="images/${char.image}" class="character-image"/>
+      <p><strong>Класс:</strong> ${char.class}</p>
+      <p><strong>Описание:</strong> ${char.description}</p>
+      <h4>Инвентарь:</h4>
+      <ul>${char.inventory.map(i => `<li>${i}</li>`).join('')}</ul>
+      <button class="button small-button" id="close-character">Закрыть</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+  modal.querySelector('#close-character').onclick = () => modal.remove();
+}
+
+// Показывает двух новых персонажей
+function showNewCharacters() {
+  const newChars = ['korgreyv', 'porje'].map(id => data.characters.characters.find(c => c.id === id)).filter(Boolean);
+  const oldChar = structuredClone(selectedCharacter);
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <h3>Выберите нового персонажа</h3>
+      ${newChars.map(char => `
+        <div class="card">
+          <img src="images/${char.image}" class="character-image" loading="lazy"/>
+          <h3>${char.name}</h3>
+          <p><strong>Класс:</strong> ${char.class}</p>
+          <p>${char.description.substring(0, 100)}...</p>
+          <button class="button small-button" onclick="replaceCharacter('${char.id}', ${JSON.stringify(oldChar).replace(/"/g, '&quot;')})">Выбрать</button>
+        </div>
+      `).join('')}
+      <button class="button small-button" onclick="modal.remove()">Закрыть</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+}
+
+// Заменяет активного персонажа
+function replaceCharacter(newId, oldCharData) {
+  const newChar = data.characters.characters.find(c => c.id === newId);
+  if (!newChar) return;
+
+  const index = data.characters.characters.findIndex(c => c.id === newId);
+  data.characters.characters[index] = oldCharData;
+
+  selectedCharacter = JSON.parse(JSON.stringify(newChar));
+  localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
+  document.querySelector('.modal').remove();
+  renderLocation(currentLocationIndex);
+}
+
+// Кости
 function rollDice() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -114,15 +188,13 @@ function rollDice() {
     <div class="modal-content">
       <h3>Выберите кости</h3>
       <div>${dice.map(d => `<label><input type="checkbox" value="${d}"> ${d}</label>`).join('<br/>')}</div>
-      <button class="button small-button" id="roll-button">Бросить</button>
+      <button class="button small-button" id="roll">Бросить</button>
       <div id="dice-result" style="margin-top:1rem;"></div>
-      <button class="button small-button" id="close-dice" style="margin-top:1rem;">Закрыть</button>
+      <button class="button small-button" style="margin-top:1rem;" id="close-dice">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
-  modal.style.display = 'flex';
-
-  modal.querySelector('#roll-button').onclick = () => {
+  modal.querySelector('#roll').onclick = () => {
     const selected = [...modal.querySelectorAll('input[type=checkbox]:checked')];
     const result = selected.map(input => {
       const sides = parseInt(input.value.slice(1));
@@ -130,10 +202,10 @@ function rollDice() {
     });
     modal.querySelector('#dice-result').innerHTML = `<strong>Результаты:</strong><br>${result.join('<br>')}`;
   };
-
   modal.querySelector('#close-dice').onclick = () => modal.remove();
 }
 
+// Инвентарь
 function openInventory() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -144,12 +216,12 @@ function openInventory() {
       <div id="inventory-items"></div>
       <input type="text" id="new-item" placeholder="Новый предмет"/>
       <button class="button small-button" id="add-item">Добавить</button>
-      <button class="button small-button" style="margin-top:1rem;" id="close-inv">Закрыть</button>
+      <button class="button small-button" id="close-inventory" style="margin-top:1rem;">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
-  const list = modal.querySelector('#inventory-items');
 
+  const list = modal.querySelector('#inventory-items');
   function renderItems() {
     list.innerHTML = items.map((item, i) => `
       <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
@@ -158,8 +230,6 @@ function openInventory() {
       </div>
     `).join('');
   }
-
-  renderItems();
 
   modal.querySelector('#add-item').onclick = () => {
     const val = modal.querySelector('#new-item').value.trim();
@@ -170,14 +240,16 @@ function openInventory() {
     }
   };
 
-  modal.querySelector('#close-inv').onclick = () => {
+  modal.querySelector('#close-inventory').onclick = () => {
     selectedCharacter.inventory = items;
     localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
     modal.remove();
   };
-  modal.style.display = 'flex';
+
+  renderItems();
 }
 
+// Заметки
 function openNotes() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -207,8 +279,6 @@ function openNotes() {
     });
   }
 
-  renderNotes();
-
   modal.querySelector('#add-note').onclick = () => {
     const val = modal.querySelector('#new-note').value.trim();
     if (val) {
@@ -223,27 +293,8 @@ function openNotes() {
     localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
     modal.remove();
   };
-  modal.style.display = 'flex';
-}
 
-function showCharacterCard(id) {
-  const char = data.characters.characters.find(c => c.id.toString() === id.toString());
-  if (!char) return;
-  const modal = document.createElement('div');
-  modal.className = 'modal';
-  modal.innerHTML = `
-    <div class="modal-content">
-      <h2>${char.name}</h2>
-      <img src="images/${char.image}" class="character-image"/>
-      <p><strong>Класс:</strong> ${char.class}</p>
-      <p><strong>Описание:</strong> ${char.description}</p>
-      <h4>Инвентарь:</h4>
-      <ul>${char.inventory.map(i => `<li>${i}</li>`).join('')}</ul>
-      <button class="button small-button" onclick="modal.remove()">Закрыть</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  modal.style.display = 'flex';
+  renderNotes();
 }
 
 // Инициализация
