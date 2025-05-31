@@ -1,9 +1,9 @@
+// script.js
 const app = document.getElementById('app');
 let selectedCharacter = null;
 let currentLocationIndex = 0;
 document.body.style.backgroundColor = '#808080';
 
-// Загрузка данных
 async function loadData() {
   const [charsRes, locsRes] = await Promise.all([
     fetch('characters.json'),
@@ -15,7 +15,6 @@ async function loadData() {
   };
 }
 
-// Плавный переход
 function fadeTransition(callback) {
   app.style.opacity = 0;
   setTimeout(() => {
@@ -24,7 +23,6 @@ function fadeTransition(callback) {
   }, 300);
 }
 
-// Главное меню
 function renderMainMenu() {
   app.innerHTML = `
     <div class="container" style="text-align:center;">
@@ -34,7 +32,6 @@ function renderMainMenu() {
   `;
 }
 
-// Выбор персонажа
 function renderCharacterSelection() {
   const html = `
     <div class="container">
@@ -54,7 +51,6 @@ function renderCharacterSelection() {
   app.innerHTML = html;
 }
 
-// Сохранение выбранного персонажа
 function selectCharacter(id) {
   const character = data.characters.characters.find(c => c.id.toString() === id.toString());
   if (!character) return;
@@ -65,7 +61,6 @@ function selectCharacter(id) {
   renderLocation(currentLocationIndex);
 }
 
-// Отображение локации
 function renderLocation(index) {
   const loc = data.locations.locations[index];
   if (!loc) return;
@@ -112,16 +107,13 @@ function renderLocation(index) {
   });
 }
 
-// Обновление характеристик
 function updateStat(stat, value) {
   selectedCharacter.stats[stat] = parseInt(value);
   localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
 }
 
-// Карточка персонажа
-function showCharacterCard(id) {
-  const char = data.characters.characters.find(c => c.id.toString() === id.toString());
-  if (!char) return;
+function showCharacterCard() {
+  const char = selectedCharacter;
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.innerHTML = `
@@ -132,15 +124,13 @@ function showCharacterCard(id) {
       <p><strong>Описание:</strong> ${char.description}</p>
       <h4>Инвентарь:</h4>
       <ul>${char.inventory.map(i => `<li>${i}</li>`).join('')}</ul>
-      <button class="button small-button" id="close-character">Закрыть</button>
+      <button class="button small-button" onclick="this.closest('.modal').remove()">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
   modal.style.display = 'flex';
-  modal.querySelector('#close-character').onclick = () => modal.remove();
 }
 
-// Показывает двух новых персонажей
 function showNewCharacters() {
   const newChars = ['korgreyv', 'porje'].map(id => data.characters.characters.find(c => c.id === id)).filter(Boolean);
   const oldChar = structuredClone(selectedCharacter);
@@ -155,31 +145,33 @@ function showNewCharacters() {
           <h3>${char.name}</h3>
           <p><strong>Класс:</strong> ${char.class}</p>
           <p>${char.description.substring(0, 100)}...</p>
-          <button class="button small-button" onclick="replaceCharacter('${char.id}', ${JSON.stringify(oldChar).replace(/"/g, '&quot;')})">Выбрать</button>
+          <button class="button small-button" onclick="replaceCharacter('${char.id}', '${oldChar.id}')">Выбрать</button>
         </div>
       `).join('')}
-      <button class="button small-button" onclick="modal.remove()">Закрыть</button>
+      <button class="button small-button" onclick="this.closest('.modal').remove()">Закрыть</button>
     </div>
   `;
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 }
 
-// Заменяет активного персонажа
-function replaceCharacter(newId, oldCharData) {
+function replaceCharacter(newId, oldId) {
   const newChar = data.characters.characters.find(c => c.id === newId);
-  if (!newChar) return;
+  const oldChar = data.characters.characters.find(c => c.id === oldId);
 
+  if (!newChar || !oldChar) return;
+
+  // Сохраняем старого в список, нового делаем активным
   const index = data.characters.characters.findIndex(c => c.id === newId);
-  data.characters.characters[index] = oldCharData;
+  data.characters.characters[index] = oldChar;
 
   selectedCharacter = JSON.parse(JSON.stringify(newChar));
   localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
+
   document.querySelector('.modal').remove();
   renderLocation(currentLocationIndex);
 }
 
-// Кости
 function rollDice() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -205,7 +197,6 @@ function rollDice() {
   modal.querySelector('#close-dice').onclick = () => modal.remove();
 }
 
-// Инвентарь
 function openInventory() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -220,15 +211,26 @@ function openInventory() {
     </div>
   `;
   document.body.appendChild(modal);
-
   const list = modal.querySelector('#inventory-items');
+
   function renderItems() {
-    list.innerHTML = items.map((item, i) => `
-      <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
-        <input type="text" value="${item}" onchange="items[${i}] = this.value" />
-        <button class="button small-button" onclick="items.splice(${i}, 1); renderItems()">Удалить</button>
-      </div>
-    `).join('');
+    list.innerHTML = '';
+    items.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.style.display = 'flex';
+      div.style.gap = '0.5rem';
+      div.style.marginBottom = '0.5rem';
+      div.innerHTML = `
+        <input type="text" value="${item}" />
+        <button class="button small-button">Удалить</button>
+      `;
+      div.querySelector('input').oninput = e => items[index] = e.target.value;
+      div.querySelector('button').onclick = () => {
+        items.splice(index, 1);
+        renderItems();
+      };
+      list.appendChild(div);
+    });
   }
 
   modal.querySelector('#add-item').onclick = () => {
@@ -249,11 +251,10 @@ function openInventory() {
   renderItems();
 }
 
-// Заметки
 function openNotes() {
   const modal = document.createElement('div');
   modal.className = 'modal';
-  let notes = selectedCharacter.notes || [];
+  let notes = [...(selectedCharacter.notes || [])];
   modal.innerHTML = `
     <div class="modal-content">
       <h3>Заметки</h3>
@@ -264,18 +265,22 @@ function openNotes() {
     </div>
   `;
   document.body.appendChild(modal);
-
   const list = modal.querySelector('#notes-list');
 
   function renderNotes() {
-    list.innerHTML = notes.map((note, i) => `
-      <div>
+    list.innerHTML = '';
+    notes.forEach((note, index) => {
+      const div = document.createElement('div');
+      div.innerHTML = `
         <textarea rows="2">${note}</textarea>
-        <button class="button small-button" onclick="notes.splice(${i}, 1); renderNotes()">Удалить</button>
-      </div>
-    `).join('');
-    [...list.querySelectorAll('textarea')].forEach((ta, i) => {
-      ta.oninput = e => notes[i] = e.target.value;
+        <button class="button small-button">Удалить</button>
+      `;
+      div.querySelector('textarea').oninput = e => notes[index] = e.target.value;
+      div.querySelector('button').onclick = () => {
+        notes.splice(index, 1);
+        renderNotes();
+      };
+      list.appendChild(div);
     });
   }
 
