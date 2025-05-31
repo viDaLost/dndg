@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Georgia', serif;
   background-color: #808080;
   color: #fff;
 }
@@ -11,15 +11,10 @@ body {
   margin: auto;
 }
 
-img.location-image {
+img.location-image, .character-image {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 1rem;
-}
-
-img.character-image {
-  max-width: 100%;
-  border-radius: 8px;
 }
 
 .stats-grid {
@@ -27,7 +22,6 @@ img.character-image {
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: space-between;
-  margin-bottom: 1rem;
 }
 
 .stat-box {
@@ -38,28 +32,30 @@ img.character-image {
   width: 100%;
   padding: 0.3rem;
   border-radius: 6px;
-  border: none;
+  border: 2px solid #c2a86f;
   font-size: 0.9rem;
+  background: #f7f3e9;
+  color: #333;
 }
 
 .button {
   padding: 0.5rem 1rem;
   font-size: 1rem;
-  background-color: #444;
-  color: #fff;
-  border: none;
+  background-color: #6e4f2b;
+  color: #fff3c0;
+  border: 2px solid #c2a86f;
   border-radius: 12px;
   cursor: pointer;
   transition: background 0.3s;
 }
 
 .button:hover {
-  background-color: #666;
+  background-color: #8b6535;
 }
 
 .small-button {
-  font-size: 0.8rem;
-  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
 }
 
 .navigation-buttons,
@@ -68,7 +64,7 @@ img.character-image {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
-  margin: 0.5rem 0;
+  margin: 1rem 0;
 }
 
 .modal {
@@ -83,11 +79,11 @@ img.character-image {
 }
 
 .modal-content {
-  background: #222;
-  color: #fff;
+  background: #3b2d1f;
+  color: #fffbe0;
   padding: 1rem;
+  border-radius: 10px;
   max-height: 90vh;
   overflow-y: auto;
-  border-radius: 10px;
   max-width: 90vw;
 }
