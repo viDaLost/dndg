@@ -1,4 +1,3 @@
-// script.js
 const app = document.getElementById('app');
 let selectedCharacter = null;
 let currentLocationIndex = 0;
@@ -89,7 +88,7 @@ function renderLocation(index) {
           </div>
         </div>
         <div class="action-buttons">
-          <button class="button small-button" onclick="showCharacterCard(selectedCharacter.id)">Карточка</button>
+          <button class="button small-button" onclick="showCharacterCard()">Карточка</button>
           <button class="button small-button" onclick="rollDice()">Кости</button>
           <button class="button small-button" onclick="openInventory()">Инвентарь</button>
           <button class="button small-button" onclick="openNotes()">Заметки</button>
@@ -133,7 +132,6 @@ function showCharacterCard() {
 
 function showNewCharacters() {
   const newChars = ['korgreyv', 'porje'].map(id => data.characters.characters.find(c => c.id === id)).filter(Boolean);
-  const oldChar = structuredClone(selectedCharacter);
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.innerHTML = `
@@ -145,7 +143,7 @@ function showNewCharacters() {
           <h3>${char.name}</h3>
           <p><strong>Класс:</strong> ${char.class}</p>
           <p>${char.description.substring(0, 100)}...</p>
-          <button class="button small-button" onclick="replaceCharacter('${char.id}', '${oldChar.id}')">Выбрать</button>
+          <button class="button small-button" onclick="replaceCharacter('${char.id}')">Выбрать</button>
         </div>
       `).join('')}
       <button class="button small-button" onclick="this.closest('.modal').remove()">Закрыть</button>
@@ -155,20 +153,12 @@ function showNewCharacters() {
   modal.style.display = 'flex';
 }
 
-function replaceCharacter(newId, oldId) {
+function replaceCharacter(newId) {
   const newChar = data.characters.characters.find(c => c.id === newId);
-  const oldChar = data.characters.characters.find(c => c.id === oldId);
-
-  if (!newChar || !oldChar) return;
-
-  // Сохраняем старого в список, нового делаем активным
-  const index = data.characters.characters.findIndex(c => c.id === newId);
-  data.characters.characters[index] = oldChar;
-
+  if (!newChar) return;
   selectedCharacter = JSON.parse(JSON.stringify(newChar));
   localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
-
-  document.querySelector('.modal').remove();
+  document.querySelector('.modal')?.remove();
   renderLocation(currentLocationIndex);
 }
 
