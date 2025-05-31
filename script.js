@@ -2,7 +2,6 @@ const app = document.getElementById('app');
 let selectedCharacter = null;
 let currentLocationIndex = 0;
 document.body.style.backgroundColor = '#808080';
-
 async function loadData() {
   const [charsRes, locsRes] = await Promise.all([
     fetch('characters.json'),
@@ -13,7 +12,6 @@ async function loadData() {
     locations: await locsRes.json()
   };
 }
-
 function fadeTransition(callback) {
   app.style.opacity = 0;
   setTimeout(() => {
@@ -21,7 +19,6 @@ function fadeTransition(callback) {
     setTimeout(() => (app.style.opacity = 1), 50);
   }, 300);
 }
-
 function renderMainMenu() {
   app.innerHTML = `
     <div class="container" style="text-align:center;">
@@ -30,7 +27,27 @@ function renderMainMenu() {
     </div>
   `;
 }
-
+function showFullCharacterInfo(char) {
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <h2>${char.name}</h2>
+      <img src="images/${char.image}" class="character-image"/>
+      <p><strong>Класс:</strong> ${char.class}</p>
+      <p><strong>Описание:</strong> ${char.description}</p>
+      <h4>Характеристики:</h4>
+      <ul>
+        ${Object.entries(char.stats).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
+      </ul>
+      <h4>Инвентарь:</h4>
+      <ul>${char.inventory.map(i => `<li>${i}</li>`).join('')}</ul>
+      <button class="button small-button" onclick="this.closest('.modal').remove()">Закрыть</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+}
 function renderCharacterSelection() {
   const html = `
     <div class="container">
@@ -39,7 +56,7 @@ function renderCharacterSelection() {
         .filter(char => !['korgreyv', 'porje', 'andrey'].includes(char.id.toString()))
         .map(char => `
         <div class="card">
-          <img src="images/${char.image}" class="character-image" loading="lazy" onclick="showCharacterCard('${char.id}')"/>
+          <img src="images/${char.image}" class="character-image" loading="lazy" onclick="showFullCharacterInfo(${JSON.stringify(char)})"/>
           <h3>${char.name}</h3>
           <p><strong>Класс:</strong> ${char.class}</p>
           <button class="button" onclick="selectCharacter('${char.id}')">Выбрать</button>
@@ -49,7 +66,6 @@ function renderCharacterSelection() {
   `;
   app.innerHTML = html;
 }
-
 function selectCharacter(id) {
   const character = data.characters.characters.find(c => c.id.toString() === id.toString());
   if (!character) return;
@@ -59,17 +75,14 @@ function selectCharacter(id) {
   currentLocationIndex = 0;
   renderLocation(currentLocationIndex);
 }
-
 function renderLocation(index) {
   const loc = data.locations.locations[index];
   if (!loc) return;
   currentLocationIndex = index;
   localStorage.setItem('currentLocationIndex', index);
-
   const showNewButton = loc.title.toLowerCase().includes("коллегия магов")
     ? `<button class="button small-button" onclick="showNewCharacters()">Показать персонажей</button>`
     : '';
-
   fadeTransition(() => {
     app.innerHTML = `
       <div class="container">
@@ -88,7 +101,7 @@ function renderLocation(index) {
           </div>
         </div>
         <div class="action-buttons">
-          <button class="button small-button" onclick="showCharacterCard()">Карточка</button>
+          <button class="button small-button" onclick="showFullCharacterInfo(selectedCharacter)">Карточка</button>
           <button class="button small-button" onclick="rollDice()">Кости</button>
           <button class="button small-button" onclick="openInventory()">Инвентарь</button>
           <button class="button small-button" onclick="openNotes()">Заметки</button>
@@ -105,31 +118,10 @@ function renderLocation(index) {
     `;
   });
 }
-
 function updateStat(stat, value) {
   selectedCharacter.stats[stat] = parseInt(value);
   localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
 }
-
-function showCharacterCard() {
-  const char = selectedCharacter;
-  const modal = document.createElement('div');
-  modal.className = 'modal';
-  modal.innerHTML = `
-    <div class="modal-content">
-      <h2>${char.name}</h2>
-      <img src="images/${char.image}" class="character-image"/>
-      <p><strong>Класс:</strong> ${char.class}</p>
-      <p><strong>Описание:</strong> ${char.description}</p>
-      <h4>Инвентарь:</h4>
-      <ul>${char.inventory.map(i => `<li>${i}</li>`).join('')}</ul>
-      <button class="button small-button" onclick="this.closest('.modal').remove()">Закрыть</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  modal.style.display = 'flex';
-}
-
 function showNewCharacters() {
   const newChars = ['korgreyv', 'porje'].map(id => data.characters.characters.find(c => c.id === id)).filter(Boolean);
   const modal = document.createElement('div');
@@ -152,7 +144,6 @@ function showNewCharacters() {
   document.body.appendChild(modal);
   modal.style.display = 'flex';
 }
-
 function replaceCharacter(newId) {
   const newChar = data.characters.characters.find(c => c.id === newId);
   if (!newChar) return;
@@ -161,7 +152,6 @@ function replaceCharacter(newId) {
   document.querySelector('.modal')?.remove();
   renderLocation(currentLocationIndex);
 }
-
 function rollDice() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -186,7 +176,6 @@ function rollDice() {
   };
   modal.querySelector('#close-dice').onclick = () => modal.remove();
 }
-
 function openInventory() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -202,7 +191,6 @@ function openInventory() {
   `;
   document.body.appendChild(modal);
   const list = modal.querySelector('#inventory-items');
-
   function renderItems() {
     list.innerHTML = '';
     items.forEach((item, index) => {
@@ -222,7 +210,6 @@ function openInventory() {
       list.appendChild(div);
     });
   }
-
   modal.querySelector('#add-item').onclick = () => {
     const val = modal.querySelector('#new-item').value.trim();
     if (val) {
@@ -231,16 +218,13 @@ function openInventory() {
       renderItems();
     }
   };
-
   modal.querySelector('#close-inventory').onclick = () => {
     selectedCharacter.inventory = items;
     localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
     modal.remove();
   };
-
   renderItems();
 }
-
 function openNotes() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -256,7 +240,6 @@ function openNotes() {
   `;
   document.body.appendChild(modal);
   const list = modal.querySelector('#notes-list');
-
   function renderNotes() {
     list.innerHTML = '';
     notes.forEach((note, index) => {
@@ -273,7 +256,6 @@ function openNotes() {
       list.appendChild(div);
     });
   }
-
   modal.querySelector('#add-note').onclick = () => {
     const val = modal.querySelector('#new-note').value.trim();
     if (val) {
@@ -282,16 +264,13 @@ function openNotes() {
       renderNotes();
     }
   };
-
   modal.querySelector('#close-notes').onclick = () => {
     selectedCharacter.notes = notes;
     localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacter));
     modal.remove();
   };
-
   renderNotes();
 }
-
 // Инициализация
 let data;
 loadData().then(d => {
