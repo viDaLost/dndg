@@ -18,38 +18,35 @@
   <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
   <noscript><div class="noscript">Для запуска приложения включите JavaScript.</div></noscript>
 
-  <!-- Важно: обычный скрипт с defer -->
+  <!-- ВАЖНО: обычный скрипт с defer (НЕ type="module") -->
   <script src="./script.js" defer></script>
 
-  <!-- Ловушки ошибок -->
+  <!-- Лёгкие ловушки ошибок + сторожок пути -->
   <script>
-    (function(){
-      function showErr(title, msg){
+    (function () {
+      function showErr(title, msg) {
         var app = document.getElementById('app');
         if (!app) return;
         var box = document.createElement('div');
         box.className = 'card';
         box.style.margin = '1rem';
-        box.innerHTML = '<h3>'+title+'</h3><pre style="white-space:pre-wrap;">'+msg+'</pre>';
+        box.innerHTML = '<h3>' + title + '</h3><pre style="white-space:pre-wrap;">' + msg + '</pre>';
         app.prepend(box);
       }
-      window.addEventListener('error', function(e){
+      window.addEventListener('error', function (e) {
         showErr('JS-ошибка', (e.error && e.error.stack) ? e.error.stack : e.message);
       });
-      window.addEventListener('unhandledrejection', function(e){
+      window.addEventListener('unhandledrejection', function (e) {
         showErr('Необработанный промис', (e.reason && e.reason.stack) ? e.reason.stack : String(e.reason));
       });
-
-      // Страж: если спустя 1500 мс ничего не отрисовано
-      setTimeout(function(){
+      setTimeout(function () {
         var app = document.getElementById('app');
         if (!app || app.childElementCount) return;
-        var base = location.origin + location.pathname.replace(/[^/]*$/,'');
-        app.innerHTML = '<div class="card"><h3>Приложение не загрузилось</h3>'
-          + '<p>Проверь путь к <code>script.js</code> и что файл доступен по адресу:</p>'
-          + '<p><code>'+ base +'script.js</code></p>'
-          + '<p class="muted">Если файл открывается, но тут пусто — значит в рантайме есть ошибка. Смотри блоки «JS-ошибка» выше.</p>'
-          + '</div>';
+        var base = location.origin + location.pathname.replace(/[^/]*$/, '');
+        app.innerHTML =
+          '<div class="card"><h3>Приложение не загрузилось</h3>' +
+          '<p>Проверь путь к <code>script.js</code> и что файл доступен по адресу:</p>' +
+          '<p><code>' + base + 'script.js</code></p></div>';
       }, 1500);
     })();
   </script>
