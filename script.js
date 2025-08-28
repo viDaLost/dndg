@@ -1,6 +1,8 @@
 // script.js — обновлённая версия
-
+console.log('[BOOT] script.js подключен');
+document.getElementById('app').innerHTML = '<div class="card">JS подключен, инициализация…</div>';
 const APP = (() => {
+  
   const app = document.getElementById('app');
   const btnHome = document.getElementById('btn-home');
   const toastEl = document.getElementById('toast');
