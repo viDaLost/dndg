@@ -18,20 +18,40 @@
   <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
   <noscript><div class="noscript">Для запуска приложения включите JavaScript.</div></noscript>
 
-  <script type="module" src="script.js"></script>
+  <!-- Важно: обычный скрипт с defer -->
+  <script src="./script.js" defer></script>
 
-  <!-- Проверка загрузки JS -->
+  <!-- Ловушки ошибок -->
   <script>
-    setTimeout(() => {
-      const app = document.getElementById('app');
-      if (!app || app.childElementCount) return;
-      app.innerHTML = `
-        <div style="padding:1rem" class="card">
-          <h3>Приложение не загрузилось</h3>
-          <p>Проверь путь к <code>script.js</code> и что файл доступен по адресу:</p>
-          <p><code>${location.origin}${location.pathname.replace(/[^/]*$/,'')}script.js</code></p>
-        </div>`;
-    }, 1200);
+    (function(){
+      function showErr(title, msg){
+        var app = document.getElementById('app');
+        if (!app) return;
+        var box = document.createElement('div');
+        box.className = 'card';
+        box.style.margin = '1rem';
+        box.innerHTML = '<h3>'+title+'</h3><pre style="white-space:pre-wrap;">'+msg+'</pre>';
+        app.prepend(box);
+      }
+      window.addEventListener('error', function(e){
+        showErr('JS-ошибка', (e.error && e.error.stack) ? e.error.stack : e.message);
+      });
+      window.addEventListener('unhandledrejection', function(e){
+        showErr('Необработанный промис', (e.reason && e.reason.stack) ? e.reason.stack : String(e.reason));
+      });
+
+      // Страж: если спустя 1500 мс ничего не отрисовано
+      setTimeout(function(){
+        var app = document.getElementById('app');
+        if (!app || app.childElementCount) return;
+        var base = location.origin + location.pathname.replace(/[^/]*$/,'');
+        app.innerHTML = '<div class="card"><h3>Приложение не загрузилось</h3>'
+          + '<p>Проверь путь к <code>script.js</code> и что файл доступен по адресу:</p>'
+          + '<p><code>'+ base +'script.js</code></p>'
+          + '<p class="muted">Если файл открывается, но тут пусто — значит в рантайме есть ошибка. Смотри блоки «JS-ошибка» выше.</p>'
+          + '</div>';
+      }, 1500);
+    })();
   </script>
 </body>
 </html>
