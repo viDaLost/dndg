@@ -127,6 +127,7 @@ const APP = (() => {
     modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
 
     document.body.appendChild(modal);
+    // фокус-трап
     const focusables = modal.querySelectorAll('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
     focusables[0]?.focus();
     return { close, modal };
@@ -266,7 +267,7 @@ const APP = (() => {
 
         <div class="card">
           <h3>Характеристики</h3>
-          <div class="stats-row" id="stats"></div>
+          <div class="stats-grid" id="stats"></div>
         </div>
 
         <div class="actions">
@@ -288,17 +289,17 @@ const APP = (() => {
     const img = app.querySelector('img.location-image');
     imageFallback(img);
 
-    // рендер статов компактными "пилюлями"
+    // рендер статов с дебаунсом
     const statsWrap = document.getElementById('stats');
     const entries = Object.entries(selectedCharacter.stats || {});
     entries.forEach(([k, v]) => {
-      const pill = document.createElement('div');
-      pill.className = 'stat-pill';
-      pill.innerHTML = `
+      const box = document.createElement('div');
+      box.className = 'stat-box';
+      box.innerHTML = `
         <label>${k}</label>
-        <input class="stat-input" type="number" inputmode="numeric" value="${Number(v) || 0}" data-stat="${k}">
+        <input class="number" type="number" inputmode="numeric" value="${Number(v) || 0}" data-stat="${k}">
       `;
-      statsWrap.appendChild(pill);
+      statsWrap.appendChild(box);
     });
 
     let saveTimer;
@@ -312,6 +313,7 @@ const APP = (() => {
       saveTimer = setTimeout(() => { saveState(); showToast('Сохранено'); }, 300);
     });
 
+    // кнопки
     document.getElementById('btn-card').addEventListener('click', () => showFullCharacterInfo(selectedCharacter.id ?? selectedCharacter.name ?? ''));
     document.getElementById('btn-dice').addEventListener('click', rollDice);
     document.getElementById('btn-inv').addEventListener('click', openInventory);
@@ -528,6 +530,7 @@ const APP = (() => {
     const ok = await loadData();
     if (!ok) return;
 
+    // куда идти при старте
     if (selectedCharacter) {
       renderLocation(currentLocationIndex);
     } else {
