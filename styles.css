@@ -1,97 +1,179 @@
-/* styles.css - обновлённый стиль в духе авантюризма и приключений */
-
-/* Общие стили */
-body {
-  margin: 0;
-  font-family: 'Georgia', serif;
-  background-color: #808080;
-  color: #fff;
+/* ====== БАЗА / ТЕМАТИКА АВАНТЮРЫ ====== */
+:root{
+  --bg:#2b2118;          /* фон приложения */
+  --bg-elev:#3b2d1f;     /* карточки и модалки */
+  --text:#fffbe0;        /* основной текст */
+  --muted:#c2a86f;       /* рамки/акценты */
+  --accent:#6e4f2b;      /* кнопки */
+  --accent-2:#8b6535;    /* hover */
+  --input-bg:#f8f3e6;    /* поля ввода */
+  --input-text:#333;
+  --ring:rgba(194,168,111,.45);
+  --danger:#d66;
+  --ok:#4caf50;
 }
 
-.container {
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-header{
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0)) , var(--bg-elev);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  backdrop-filter: blur(6px);
+}
+
+.app-title{ font-weight: 700; letter-spacing:.5px; }
+
+.icon-btn{
+  background: var(--accent);
+  color: #fff3c0;
+  border: 2px solid var(--muted);
+  border-radius: 12px;
+  padding: .4rem .6rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.icon-btn:active{ transform: translateY(1px); }
+.icon-btn:hover{ background: var(--accent-2); }
+
+#app{
   padding: 1rem;
-  max-width: 800px;
-  margin: auto;
+  max-width: 860px;
+  margin: 0 auto;
+  transition: opacity .25s ease, transform .25s ease;
+}
+
+.container { display: grid; gap: 1rem; }
+
+.grid-cards{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+}
+@media (min-width: 720px){
+  .grid-cards{ grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+}
+
+.card{
+  background: var(--bg-elev);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: .75rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
 }
 
 img.location-image,
 img.character-image {
   width: 100%;
   border-radius: 10px;
-  margin-bottom: 1rem;
-}
-
-/* Стили для блока характеристик */
-.stats-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: space-between;
-}
-
-.stat-box {
-  width: 48%;
-  margin-bottom: 0.5rem;
-}
-
-.stat-box input {
-  width: 100%;
-  padding: 0.2rem;
-  font-size: 0.9rem;
-  border-radius: 6px;
-  border: 1px solid #c2a86f;
-  background: #f8f3e6;
-  color: #333;
+  margin-bottom: .6rem;
+  display: block;
+  background: rgba(0,0,0,.2);
 }
 
 /* Кнопки */
-.button {
-  padding: 0.5rem 1rem;
+.button{
+  padding: 0.6rem 0.9rem;
   font-size: 1rem;
-  background-color: #6e4f2b;
+  background: var(--accent);
   color: #fff3c0;
-  border: 2px solid #c2a86f;
-  border-radius: 10px;
+  border: 2px solid var(--muted);
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background .2s ease;
+}
+.button:hover{ background: var(--accent-2); }
+.button.small{ font-size: .9rem; padding: .4rem .7rem; }
+.button.ghost{
+  background: transparent;
+  color: var(--text);
+  border-color: rgba(255,255,255,.25);
 }
 
-.button:hover {
-  background-color: #8b6535;
+/* Формы */
+.input, .number{
+  width: 100%;
+  padding: .45rem .6rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--muted);
+  background: var(--input-bg);
+  color: var(--input-text);
 }
 
-.button.small-button {
-  font-size: 0.85rem;
-  padding: 0.3rem 0.6rem;
+/* Сетки */
+.stats-grid{
+  display: grid; gap: .5rem;
+  grid-template-columns: 1fr 1fr;
+}
+@media (min-width: 640px){ .stats-grid{ grid-template-columns: repeat(3, 1fr); } }
+.stat-box label{ display: block; margin-bottom: .25rem; font-size: .85rem; opacity: .9; }
+
+/* Действия */
+.actions, .nav{
+  display: flex; flex-wrap: wrap;
+  gap: .5rem; justify-content: center;
 }
 
-/* Стили для блоков навигации и действий */
-.navigation-buttons,
-.action-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-
-/* Стили для модальных окон */
-.modal {
-  position: fixed;
-  z-index: 1000;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.modal-content {
-  background: #3b2d1f;
-  color: #fffbe0;
+/* Модалка */
+.modal{
+  position: fixed; inset: 0; z-index: 50;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.5);
   padding: 1rem;
-  border-radius: 10px;
-  max-width: 90vw;
+}
+.modal.open{ display: flex; }
+.modal-content{
+  background: var(--bg-elev);
+  color: var(--text);
+  padding: 1rem;
+  border-radius: 14px;
+  max-width: min(760px, 92vw);
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: auto;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 24px 36px rgba(0,0,0,.45);
+}
+
+/* Тост */
+.toast{
+  position: fixed;
+  left: 50%; transform: translateX(-50%);
+  bottom: 18px; z-index: 60;
+  background: #000c; color: #fff;
+  padding: .6rem .9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.15);
+}
+
+/* Скелетоны */
+.skeleton{
+  background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.13), rgba(255,255,255,.06));
+  background-size: 200% 100%;
+  animation: sk 1.2s infinite linear;
+  border-radius: 10px;
+}
+@keyframes sk{ 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* Переходы экрана */
+.view-enter{ opacity: 0; transform: translateY(8px); }
+.view-enter-active{ opacity: 1; transform: translateY(0); }
+
+/* Прочее */
+.center { text-align: center; }
+.muted { opacity: .85; }
+
+.noscript{
+  margin: 1rem; padding: 1rem; border-radius: 10px;
+  background: #b00; color: #fff;
 }
