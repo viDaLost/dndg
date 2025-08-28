@@ -19,5 +19,19 @@
   <noscript><div class="noscript">Для запуска приложения включите JavaScript.</div></noscript>
 
   <script type="module" src="script.js"></script>
+
+  <!-- Проверка загрузки JS -->
+  <script>
+    setTimeout(() => {
+      const app = document.getElementById('app');
+      if (!app || app.childElementCount) return;
+      app.innerHTML = `
+        <div style="padding:1rem" class="card">
+          <h3>Приложение не загрузилось</h3>
+          <p>Проверь путь к <code>script.js</code> и что файл доступен по адресу:</p>
+          <p><code>${location.origin}${location.pathname.replace(/[^/]*$/,'')}script.js</code></p>
+        </div>`;
+    }, 1200);
+  </script>
 </body>
 </html>
