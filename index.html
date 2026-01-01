@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#14100d" />
   <meta name="description" content="D&D Companion App">
   <title>Записки сумасшедшего</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
@@ -83,8 +83,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      /* Максимальная высота, чтобы не занимать весь экран, но показывать всё */
-      max-height: 60vh; 
+      max-height: 60vh;
       width: 100%;
       box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
     }
@@ -92,7 +91,7 @@
       width: 100%;
       height: auto;
       max-height: 60vh;
-      object-fit: contain; /* Ключевое: показывает всё изображение */
+      object-fit: contain;
       display: block;
       opacity: 0; transition: opacity 0.4s ease;
     }
@@ -122,7 +121,7 @@
       display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
     }
     .stat-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
-    
+
     .stepper { display: flex; align-items: center; background: #111; border-radius: 8px; }
     .stepper button {
       width: 30px; height: 30px; border: none; background: transparent; color: var(--accent);
@@ -140,7 +139,7 @@
     .btn:active { transform: scale(0.98); }
     .btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--accent); }
     .btn.danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); width: auto; padding: 0.3rem 0.6rem; font-family: sans-serif; }
-    
+
     .btn-group { display: flex; gap: 1rem; margin-top: 1rem; }
 
     /* --- LISTS (Inventory/Notes) --- */
@@ -198,7 +197,7 @@
     /* --- GRID CARDS --- */
     .grid-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
     .char-card img { width: 100%; border-radius: 8px; aspect-ratio: 1; object-fit: cover; }
-    
+
     /* --- TOAST --- */
     .toast {
       position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
@@ -256,7 +255,7 @@
       };
 
       const STORAGE_KEY = 'dnd_companion_v3';
-      
+
       // Глобальное состояние
       let state = {
         data: { characters: [], locations: [] },
@@ -298,12 +297,12 @@
             fetch('./characters.json'),
             fetch('./locations.json')
           ]);
-          
+
           if (!charsRes.ok || !locsRes.ok) throw new Error("JSON files not found");
-          
+
           const charsData = await charsRes.json();
           const locsData = await locsRes.json();
-          
+
           state.data.characters = charsData.characters || [];
           state.data.locations = locsData.locations || [];
 
@@ -332,7 +331,7 @@
       function renderMainMenu() {
         els.bottomNav.hidden = true;
         els.charIndicator.hidden = true;
-        
+
         els.app.innerHTML = `
           <div class="container" style="text-align:center; padding-top:3rem;">
             <h1 style="font-size:2.5rem; margin-bottom:1rem">Записки<br>Сумасшедшего</h1>
@@ -343,7 +342,7 @@
             </div>
           </div>
         `;
-        
+
         document.getElementById('btn-new-game').onclick = renderCharSelect;
         const btnCont = document.getElementById('btn-continue');
         if (btnCont) btnCont.onclick = renderLocationScreen;
@@ -386,10 +385,10 @@
         // Инициализируем пустые массивы, если их нет
         if (!state.user.charData.inventory) state.user.charData.inventory = [];
         if (!state.user.charData.notes) state.user.charData.notes = [];
-        
+
         state.user.selectedCharId = char.id;
         state.user.locationIndex = 0;
-        
+
         saveState();
         renderLocationScreen();
       }
@@ -402,13 +401,13 @@
         // UI обновления
         els.bottomNav.hidden = false;
         setActiveNav('map');
-        
-        if (state.user.charData.image) {
+
+        if (state.user.charData?.image) {
           els.charIndicator.hidden = false;
           els.charIndicator.style.backgroundImage = `url('images/${state.user.charData.image}')`;
         }
 
-        // Предзагрузка следующей картинки
+        // Предзагрузка
         if (state.user.locationIndex + 1 < state.data.locations.length) {
           new Image().src = `images/${state.data.locations[state.user.locationIndex + 1].image}`;
         }
@@ -423,9 +422,12 @@
         const img = new Image();
         img.src = `images/${loc.image}`;
         img.onload = () => img.classList.add('loaded');
-        img.onerror = () => { img.src = 'https://via.placeholder.com/800x600?text=No+Image'; img.classList.add('loaded'); };
+        img.onerror = () => { img.classList.add('loaded'); }; // Заглушку убрал для эстетики
         imgFrame.appendChild(img);
         container.appendChild(imgFrame);
+
+        // --- ЛОГИКА ПОЯВЛЕНИЯ НОВЫХ ПЕРСОНАЖЕЙ ---
+        const showUnlockBtn = String(loc.title || '').toLowerCase().includes('коллегия магов');
 
         // 2. Текст и навигация
         const card = document.createElement('div');
@@ -433,6 +435,9 @@
         card.innerHTML = `
           <h2>${loc.title}</h2>
           <p>${loc.description}</p>
+
+          ${showUnlockBtn ? `<button class="btn ghost" id="btn-unlock" style="border-color:var(--accent); margin-top:1rem">👥 Встретить новых спутников</button>` : ''}
+
           <div class="btn-group">
             ${state.user.locationIndex > 0 ? `<button class="btn ghost" id="prev-loc">← Назад</button>` : '<div></div>'}
             ${state.user.locationIndex < state.data.locations.length - 1 ? `<button class="btn" id="next-loc">Вперёд →</button>` : ''}
@@ -446,7 +451,7 @@
         const scroller = document.createElement('div');
         scroller.className = 'stats-scroller';
 
-        Object.entries(state.user.charData.stats).forEach(([key, val]) => {
+        Object.entries(state.user.charData.stats || {}).forEach(([key, val]) => {
           const statItem = document.createElement('div');
           statItem.className = 'stat-card';
           statItem.innerHTML = `
@@ -473,14 +478,14 @@
 
           span.textContent = currentVal;
           state.user.charData.stats[key] = currentVal;
-          saveState(); // Сохраняем сразу
+          saveState();
         };
 
         statsWrap.appendChild(scroller);
         container.appendChild(statsWrap);
         els.app.appendChild(container);
 
-        // Листенеры кнопок навигации
+        // Листенеры кнопок
         document.getElementById('prev-loc')?.addEventListener('click', () => {
           state.user.locationIndex--;
           saveState();
@@ -493,16 +498,20 @@
           els.app.scrollTo(0, 0);
           renderLocationScreen();
         });
+
+        // Листенер для секретной кнопки
+        if (showUnlockBtn) {
+          document.getElementById('btn-unlock')?.addEventListener('click', openUnlockModal);
+        }
       }
 
       // --- Модальные окна и логика ---
-      
       function openModal(type) {
         const modal = document.createElement('div');
         modal.className = 'modal';
-        
+
         let content = '';
-        
+
         // --- КОСТИ ---
         if (type === 'dice') {
           content = `
@@ -513,8 +522,8 @@
             <div id="dice-log" class="card" style="height:150px; overflow-y:auto; font-family:monospace; font-size:0.9rem; background:#111"></div>
             <button class="btn" id="close-modal" style="margin-top:1rem">Закрыть</button>
           `;
-        } 
-        
+        }
+
         // --- ИНВЕНТАРЬ ---
         else if (type === 'inv') {
           content = `
@@ -546,15 +555,14 @@
         setTimeout(() => modal.classList.add('open'), 10);
 
         // --- Логика внутри модалки ---
-        
         const closeModal = () => {
           modal.classList.remove('open');
           setTimeout(() => modal.remove(), 250);
         };
-        
+
         modal.addEventListener('click', (e) => {
           if (e.target === modal || e.target.id === 'close-modal') closeModal();
-          
+
           // Логика костей
           if (e.target.classList.contains('dice-btn')) {
             const die = e.target.dataset.d;
@@ -569,10 +577,10 @@
         const renderList = (arrayName, containerId) => {
           const container = modal.querySelector(containerId);
           if (!container) return;
-          
+
           const list = state.user.charData[arrayName] || [];
           container.innerHTML = '';
-          
+
           if (list.length === 0) {
             container.innerHTML = '<p style="text-align:center; opacity:0.5">Пусто</p>';
             return;
@@ -604,7 +612,7 @@
           renderList('inventory', '#list-container');
           const addBtn = modal.querySelector('#add-item-btn');
           const input = modal.querySelector('#new-item-input');
-          
+
           addBtn.onclick = () => {
             const val = input.value.trim();
             if (val) {
@@ -623,7 +631,7 @@
           renderList('notes', '#list-container');
           const addBtn = modal.querySelector('#add-note-btn');
           const input = modal.querySelector('#new-note-input');
-          
+
           addBtn.onclick = () => {
             const val = input.value.trim();
             if (val) {
@@ -635,6 +643,71 @@
               showToast('Заметка добавлена');
             }
           };
+        }
+      }
+
+      // --- Секретные персонажи ---
+      function openUnlockModal() {
+        const secretIds = ['korgreyv', 'porje'];
+
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+
+        const charsHTML = (state.data.characters || [])
+          .filter(c => secretIds.includes(String(c.id)))
+          .map(c => {
+            const desc = String(c.description || '');
+            const shortDesc = desc ? `${desc.substring(0, 80)}...` : 'Описание скрыто...';
+
+            return `
+              <div class="card" style="margin-bottom:1rem; text-align:center">
+                <img src="images/${c.image}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:0.5rem">
+                <h3>${c.name}</h3>
+                <p style="font-size:0.9rem">${shortDesc}</p>
+                <button class="btn" onclick="APP.switchCharacter('${c.id}')">Выбрать этого героя</button>
+              </div>
+            `;
+          }).join('');
+
+        modal.innerHTML = `
+          <div class="modal-content">
+            <h3 style="text-align:center; margin-bottom:1rem">Новые союзники</h3>
+            ${charsHTML || `<p style="text-align:center; opacity:0.7">Нет доступных персонажей</p>`}
+            <button class="btn ghost" id="close-modal">Отмена</button>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+        setTimeout(() => modal.classList.add('open'), 10);
+
+        modal.querySelector('#close-modal').onclick = () => {
+          modal.classList.remove('open');
+          setTimeout(() => modal.remove(), 250);
+        };
+      }
+
+      // Переключение персонажа (публично через APP.switchCharacter)
+      function switchCharacter(newId) {
+        const newChar = (state.data.characters || []).find(c => String(c.id) === String(newId));
+        if (!newChar) return;
+
+        if (confirm(`Сменить персонажа на ${newChar.name}? Инвентарь и заметки будут его.`)) {
+          const currentLoc = state.user.locationIndex;
+
+          state.user.charData = JSON.parse(JSON.stringify(newChar));
+          if (!state.user.charData.inventory) state.user.charData.inventory = [];
+          if (!state.user.charData.notes) state.user.charData.notes = [];
+
+          state.user.selectedCharId = newChar.id;
+          state.user.locationIndex = currentLoc;
+
+          saveState();
+
+          const m = document.querySelector('.modal');
+          if (m) m.remove();
+
+          showToast(`Вы теперь: ${newChar.name}`);
+          renderLocationScreen();
         }
       }
 
@@ -660,8 +733,12 @@
         if (confirm('Выйти в главное меню?')) renderMainMenu();
       });
 
-      return { init };
+      // ВАЖНО: отдаем switchCharacter наружу, чтобы работал onclick="APP.switchCharacter(...)"
+      return { init, switchCharacter };
     })();
+
+    // ВАЖНО: делаем доступным глобально (иначе onclick не увидит)
+    window.APP = APP;
 
     // Запуск при загрузке
     document.addEventListener('DOMContentLoaded', APP.init);
