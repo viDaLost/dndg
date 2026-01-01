@@ -3,54 +3,668 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"/>
-  <meta name="theme-color" content="#1a1614" />
+  <meta name="theme-color" content="#14100d" />
   <meta name="description" content="D&D Companion App">
   <title>Записки сумасшедшего</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="styles.css"/>
+
+  <style>
+    /* ===== CSS STYLES ===== */
+    :root {
+      --bg-dark: #14100d;
+      --bg-panel: #1e1915;
+      --bg-card: #26201b;
+      --accent: #c2a86f;        /* Золото */
+      --accent-dim: #8a7545;    /* Бронза */
+      --danger: #d32f2f;
+      --text-main: #e8e0d5;
+      --text-muted: #9c9085;
+      --border: rgba(194, 168, 111, 0.2);
+      --glass: rgba(30, 25, 21, 0.9);
+      --radius: 12px;
+      --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      font-family: 'Lato', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Фоновый шум */
+    .bg-noise {
+      position: fixed; inset: 0; pointer-events: none; z-index: -1; opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    h1, h2, h3 { font-family: 'Cinzel', serif; margin: 0; font-weight: 700; color: var(--accent); }
+    p { margin: 0 0 1rem 0; line-height: 1.5; color: var(--text-muted); }
+
+    /* --- HEADER --- */
+    .app-header {
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1rem;
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    .app-title { font-family: 'Cinzel', serif; font-weight: 700; text-transform: uppercase; color: var(--accent); }
+    .header-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); padding: 0.5rem; }
+
+    /* --- MAIN CONTENT --- */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      padding-bottom: calc(80px + var(--safe-area-bottom));
+      scroll-behavior: smooth;
+    }
+    .container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* --- IMAGES (FIXED) --- */
+    .image-frame {
+      background: #000;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Максимальная высота, чтобы не занимать весь экран, но показывать всё */
+      max-height: 60vh; 
+      width: 100%;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+    .image-frame img {
+      width: 100%;
+      height: auto;
+      max-height: 60vh;
+      object-fit: contain; /* Ключевое: показывает всё изображение */
+      display: block;
+      opacity: 0; transition: opacity 0.4s ease;
+    }
+    .image-frame img.loaded { opacity: 1; }
+
+    /* --- CARDS --- */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    /* --- STATS SCROLLER --- */
+    .stats-scroller {
+      display: flex; gap: 0.8rem; overflow-x: auto;
+      padding-bottom: 0.5rem; scroll-snap-type: x mandatory;
+    }
+    .stat-card {
+      flex: 0 0 110px;
+      scroll-snap-align: start;
+      background: var(--bg-panel);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 0.8rem;
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    }
+    .stat-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
+    
+    .stepper { display: flex; align-items: center; background: #111; border-radius: 8px; }
+    .stepper button {
+      width: 30px; height: 30px; border: none; background: transparent; color: var(--accent);
+      font-size: 1.2rem; cursor: pointer;
+    }
+    .stepper span { width: 30px; text-align: center; color: #fff; font-weight: bold; }
+
+    /* --- BUTTONS --- */
+    .btn {
+      width: 100%; padding: 0.9rem; border: none; border-radius: 10px;
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+      color: #1a1614; cursor: pointer; margin-bottom: 0.5rem;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--accent); }
+    .btn.danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); width: auto; padding: 0.3rem 0.6rem; font-family: sans-serif; }
+    
+    .btn-group { display: flex; gap: 1rem; margin-top: 1rem; }
+
+    /* --- LISTS (Inventory/Notes) --- */
+    .list-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.8rem; border-bottom: 1px solid #333;
+      background: rgba(0,0,0,0.2); margin-bottom: 4px; border-radius: 6px;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .list-text { flex: 1; margin-right: 1rem; word-break: break-word; }
+
+    /* --- INPUTS --- */
+    .input-field {
+      width: 100%; padding: 0.8rem; border-radius: 8px;
+      border: 1px solid var(--border); background: #111; color: #fff;
+      font-family: 'Lato', sans-serif; font-size: 1rem;
+    }
+    textarea.input-field { resize: vertical; min-height: 80px; }
+
+    /* --- BOTTOM NAV --- */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: calc(65px + var(--safe-area-bottom));
+      padding-bottom: var(--safe-area-bottom);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around; align-items: center;
+      z-index: 100;
+    }
+    .nav-item {
+      background: none; border: none; color: var(--text-muted);
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      font-size: 0.7rem; width: 25%; cursor: pointer;
+    }
+    .nav-icon { font-size: 1.4rem; filter: grayscale(1); transition: 0.2s; }
+    .nav-item.active { color: var(--accent); }
+    .nav-item.active .nav-icon { filter: grayscale(0); }
+
+    /* --- MODAL --- */
+    .modal {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal.open { opacity: 1; pointer-events: auto; }
+    .modal-content {
+      background: var(--bg-card); width: 90%; max-width: 500px; max-height: 85vh;
+      border-radius: 16px; border: 1px solid var(--border); padding: 1.5rem;
+      overflow-y: auto; transform: translateY(20px); transition: transform 0.2s;
+    }
+    .modal.open .modal-content { transform: translateY(0); }
+
+    /* --- GRID CARDS --- */
+    .grid-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .char-card img { width: 100%; border-radius: 8px; aspect-ratio: 1; object-fit: cover; }
+    
+    /* --- TOAST --- */
+    .toast {
+      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: #eee; color: #111; padding: 10px 20px; border-radius: 20px;
+      font-weight: bold; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 300;
+    }
+    .toast.show { opacity: 1; }
+
+    [hidden] { display: none !important; }
+  </style>
 </head>
 <body>
   <div class="bg-noise"></div>
 
   <header class="app-header">
-    <div class="header-left">
-      <button id="btn-home" class="icon-btn ghost" aria-label="Меню">
-        <span class="icon">🏰</span>
-      </button>
-    </div>
-    <div class="app-title">Записки сумасшедшего</div>
-    <div class="header-right">
-      <div id="char-avatar-mini" class="mini-avatar" hidden></div>
-    </div>
+    <button id="btn-home" class="header-btn" title="Главное меню">🏰</button>
+    <div class="app-title">Записки</div>
+    <div id="char-indicator" style="width:32px; height:32px; border-radius:50%; background:#333; background-size:cover; border:1px solid var(--accent)" hidden></div>
   </header>
 
   <main id="app" class="main-content"></main>
 
-  <div id="toast" class="toast" hidden></div>
+  <div id="toast" class="toast">Сохранено</div>
 
   <nav id="bottom-nav" class="bottom-nav" hidden>
     <button data-nav="dice" class="nav-item">
       <span class="nav-icon">🎲</span>
-      <span class="nav-label">Кости</span>
+      <span>Кости</span>
     </button>
     <button data-nav="inv" class="nav-item">
       <span class="nav-icon">🎒</span>
-      <span class="nav-label">Инвент.</span>
+      <span>Вещи</span>
     </button>
     <button data-nav="notes" class="nav-item">
       <span class="nav-icon">📜</span>
-      <span class="nav-label">Заметки</span>
+      <span>Заметки</span>
     </button>
     <button data-nav="map" class="nav-item active">
       <span class="nav-icon">📍</span>
-      <span class="nav-label">Локация</span>
+      <span>Карта</span>
     </button>
   </nav>
 
-  <script src="./script.js" defer></script>
+  <script>
+    /* ===== JAVASCRIPT LOGIC ===== */
+    const APP = (() => {
+      // Кэшируем элементы DOM
+      const els = {
+        app: document.getElementById('app'),
+        toast: document.getElementById('toast'),
+        btnHome: document.getElementById('btn-home'),
+        bottomNav: document.getElementById('bottom-nav'),
+        charIndicator: document.getElementById('char-indicator'),
+        navItems: document.querySelectorAll('.nav-item')
+      };
+
+      const STORAGE_KEY = 'dnd_companion_v3';
+      
+      // Глобальное состояние
+      let state = {
+        data: { characters: [], locations: [] },
+        user: {
+          selectedCharId: null,
+          charData: null, // Здесь храним статы, инвентарь и заметки
+          locationIndex: 0
+        }
+      };
+
+      // --- Утилиты ---
+      const showToast = (msg) => {
+        els.toast.textContent = msg;
+        els.toast.classList.add('show');
+        setTimeout(() => els.toast.classList.remove('show'), 2000);
+      };
+
+      const saveState = () => {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
+        } catch(e) { console.error('Save failed', e); }
+      };
+
+      const loadState = () => {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed.charData) state.user = parsed;
+          } catch(e) {}
+        }
+      };
+
+      // --- Инициализация ---
+      async function init() {
+        try {
+          // Загрузка данных
+          const [charsRes, locsRes] = await Promise.all([
+            fetch('./characters.json'),
+            fetch('./locations.json')
+          ]);
+          
+          if (!charsRes.ok || !locsRes.ok) throw new Error("JSON files not found");
+          
+          const charsData = await charsRes.json();
+          const locsData = await locsRes.json();
+          
+          state.data.characters = charsData.characters || [];
+          state.data.locations = locsData.locations || [];
+
+          loadState();
+
+          // Роутинг
+          if (state.user.selectedCharId && state.user.charData) {
+            renderLocationScreen();
+          } else {
+            renderMainMenu();
+          }
+        } catch (e) {
+          els.app.innerHTML = `
+            <div class="container" style="text-align:center">
+              <div class="card">
+                <h3>Ошибка запуска</h3>
+                <p>Не удалось загрузить данные (characters.json / locations.json).</p>
+                <p style="font-size:0.8rem; color:red">${e.message}</p>
+                <button class="btn" onclick="location.reload()">Повторить</button>
+              </div>
+            </div>`;
+        }
+      }
+
+      // --- Рендеринг: Главное меню ---
+      function renderMainMenu() {
+        els.bottomNav.hidden = true;
+        els.charIndicator.hidden = true;
+        
+        els.app.innerHTML = `
+          <div class="container" style="text-align:center; padding-top:3rem;">
+            <h1 style="font-size:2.5rem; margin-bottom:1rem">Записки<br>Сумасшедшего</h1>
+            <p>Ваш спутник в мире D&D</p>
+            <div style="margin-top:2rem;">
+              <button class="btn" id="btn-new-game">Новая игра</button>
+              ${state.user.charData ? `<button class="btn ghost" id="btn-continue">Продолжить</button>` : ''}
+            </div>
+          </div>
+        `;
+        
+        document.getElementById('btn-new-game').onclick = renderCharSelect;
+        const btnCont = document.getElementById('btn-continue');
+        if (btnCont) btnCont.onclick = renderLocationScreen;
+      }
+
+      // --- Рендеринг: Выбор персонажа ---
+      function renderCharSelect() {
+        els.app.innerHTML = `
+          <div class="container">
+            <h2 style="text-align:center">Выберите героя</h2>
+            <div class="grid-cards" id="char-grid"></div>
+            <button class="btn ghost" id="back-to-menu">Назад</button>
+          </div>
+        `;
+
+        const grid = document.getElementById('char-grid');
+        const hiddenIds = ['korgreyv', 'porje', 'andrey'];
+
+        state.data.characters.forEach(char => {
+          if (hiddenIds.includes(String(char.id))) return;
+
+          const card = document.createElement('div');
+          card.className = 'card char-card';
+          card.style.cursor = 'pointer';
+          card.innerHTML = `
+            <img src="images/${char.image}" alt="${char.name}">
+            <h3 style="margin-top:0.5rem; font-size:1rem">${char.name}</h3>
+            <p style="font-size:0.8rem; margin:0">${char.class}</p>
+          `;
+          card.onclick = () => startGame(char);
+          grid.appendChild(card);
+        });
+
+        document.getElementById('back-to-menu').onclick = renderMainMenu;
+      }
+
+      function startGame(char) {
+        // Создаем глубокую копию, чтобы изменения не трогали исходный JSON
+        state.user.charData = JSON.parse(JSON.stringify(char));
+        // Инициализируем пустые массивы, если их нет
+        if (!state.user.charData.inventory) state.user.charData.inventory = [];
+        if (!state.user.charData.notes) state.user.charData.notes = [];
+        
+        state.user.selectedCharId = char.id;
+        state.user.locationIndex = 0;
+        
+        saveState();
+        renderLocationScreen();
+      }
+
+      // --- Рендеринг: Локация (Основной экран) ---
+      function renderLocationScreen() {
+        const loc = state.data.locations[state.user.locationIndex];
+        if (!loc) return;
+
+        // UI обновления
+        els.bottomNav.hidden = false;
+        setActiveNav('map');
+        
+        if (state.user.charData.image) {
+          els.charIndicator.hidden = false;
+          els.charIndicator.style.backgroundImage = `url('images/${state.user.charData.image}')`;
+        }
+
+        // Предзагрузка следующей картинки
+        if (state.user.locationIndex + 1 < state.data.locations.length) {
+          new Image().src = `images/${state.data.locations[state.user.locationIndex + 1].image}`;
+        }
+
+        els.app.innerHTML = '';
+        const container = document.createElement('div');
+        container.className = 'container';
+
+        // 1. Изображение
+        const imgFrame = document.createElement('div');
+        imgFrame.className = 'image-frame';
+        const img = new Image();
+        img.src = `images/${loc.image}`;
+        img.onload = () => img.classList.add('loaded');
+        img.onerror = () => { img.src = 'https://via.placeholder.com/800x600?text=No+Image'; img.classList.add('loaded'); };
+        imgFrame.appendChild(img);
+        container.appendChild(imgFrame);
+
+        // 2. Текст и навигация
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h2>${loc.title}</h2>
+          <p>${loc.description}</p>
+          <div class="btn-group">
+            ${state.user.locationIndex > 0 ? `<button class="btn ghost" id="prev-loc">← Назад</button>` : '<div></div>'}
+            ${state.user.locationIndex < state.data.locations.length - 1 ? `<button class="btn" id="next-loc">Вперёд →</button>` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+
+        // 3. Характеристики (Скролл)
+        const statsWrap = document.createElement('div');
+        statsWrap.innerHTML = `<h3>Характеристики</h3>`;
+        const scroller = document.createElement('div');
+        scroller.className = 'stats-scroller';
+
+        Object.entries(state.user.charData.stats).forEach(([key, val]) => {
+          const statItem = document.createElement('div');
+          statItem.className = 'stat-card';
+          statItem.innerHTML = `
+            <span class="stat-label">${key}</span>
+            <div class="stepper">
+              <button data-action="dec" data-key="${key}">−</button>
+              <span>${val}</span>
+              <button data-action="inc" data-key="${key}">+</button>
+            </div>
+          `;
+          scroller.appendChild(statItem);
+        });
+
+        // Делегирование кликов по статам
+        scroller.onclick = (e) => {
+          const btn = e.target.closest('button');
+          if (!btn) return;
+          const key = btn.dataset.key;
+          const span = btn.parentElement.querySelector('span');
+          let currentVal = parseInt(span.textContent);
+
+          if (btn.dataset.action === 'inc') currentVal++;
+          else currentVal--;
+
+          span.textContent = currentVal;
+          state.user.charData.stats[key] = currentVal;
+          saveState(); // Сохраняем сразу
+        };
+
+        statsWrap.appendChild(scroller);
+        container.appendChild(statsWrap);
+        els.app.appendChild(container);
+
+        // Листенеры кнопок навигации
+        document.getElementById('prev-loc')?.addEventListener('click', () => {
+          state.user.locationIndex--;
+          saveState();
+          els.app.scrollTo(0, 0);
+          renderLocationScreen();
+        });
+        document.getElementById('next-loc')?.addEventListener('click', () => {
+          state.user.locationIndex++;
+          saveState();
+          els.app.scrollTo(0, 0);
+          renderLocationScreen();
+        });
+      }
+
+      // --- Модальные окна и логика ---
+      
+      function openModal(type) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        
+        let content = '';
+        
+        // --- КОСТИ ---
+        if (type === 'dice') {
+          content = `
+            <h3>Бросок костей</h3>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:1rem 0">
+              ${['D4','D6','D8','D10','D12','D20'].map(d => `<button class="btn ghost dice-btn" data-d="${d}">${d}</button>`).join('')}
+            </div>
+            <div id="dice-log" class="card" style="height:150px; overflow-y:auto; font-family:monospace; font-size:0.9rem; background:#111"></div>
+            <button class="btn" id="close-modal" style="margin-top:1rem">Закрыть</button>
+          `;
+        } 
+        
+        // --- ИНВЕНТАРЬ ---
+        else if (type === 'inv') {
+          content = `
+            <h3>Инвентарь</h3>
+            <div style="display:flex; gap:0.5rem; margin-bottom:1rem">
+              <input id="new-item-input" class="input-field" placeholder="Название предмета...">
+              <button id="add-item-btn" class="btn" style="width:auto; margin:0">+</button>
+            </div>
+            <div id="list-container" style="max-height:50vh; overflow-y:auto"></div>
+            <button class="btn ghost" id="close-modal" style="margin-top:1rem">Закрыть</button>
+          `;
+        }
+
+        // --- ЗАМЕТКИ ---
+        else if (type === 'notes') {
+          content = `
+            <h3>Заметки</h3>
+            <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem">
+              <textarea id="new-note-input" class="input-field" placeholder="Текст заметки..."></textarea>
+              <button id="add-note-btn" class="btn">Добавить заметку</button>
+            </div>
+            <div id="list-container" style="max-height:40vh; overflow-y:auto"></div>
+            <button class="btn ghost" id="close-modal" style="margin-top:1rem">Закрыть</button>
+          `;
+        }
+
+        modal.innerHTML = `<div class="modal-content">${content}</div>`;
+        document.body.appendChild(modal);
+        setTimeout(() => modal.classList.add('open'), 10);
+
+        // --- Логика внутри модалки ---
+        
+        const closeModal = () => {
+          modal.classList.remove('open');
+          setTimeout(() => modal.remove(), 250);
+        };
+        
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal || e.target.id === 'close-modal') closeModal();
+          
+          // Логика костей
+          if (e.target.classList.contains('dice-btn')) {
+            const die = e.target.dataset.d;
+            const max = parseInt(die.substring(1));
+            const res = Math.floor(Math.random() * max) + 1;
+            const log = modal.querySelector('#dice-log');
+            log.innerHTML = `<div style="padding:5px; border-bottom:1px solid #333">🎲 <strong>${die}</strong>: <span style="color:var(--accent); font-weight:bold">${res}</span></div>` + log.innerHTML;
+          }
+        });
+
+        // Функция рендера списков (Инвентарь / Заметки)
+        const renderList = (arrayName, containerId) => {
+          const container = modal.querySelector(containerId);
+          if (!container) return;
+          
+          const list = state.user.charData[arrayName] || [];
+          container.innerHTML = '';
+          
+          if (list.length === 0) {
+            container.innerHTML = '<p style="text-align:center; opacity:0.5">Пусто</p>';
+            return;
+          }
+
+          list.forEach((item, index) => {
+            const row = document.createElement('div');
+            row.className = 'list-item';
+            row.innerHTML = `
+              <div class="list-text">${item}</div>
+              <button class="btn danger" data-del="${index}">✖</button>
+            `;
+            container.appendChild(row);
+          });
+
+          // Навешиваем обработчики удаления
+          container.querySelectorAll('button[data-del]').forEach(btn => {
+            btn.onclick = () => {
+              const idx = parseInt(btn.dataset.del);
+              state.user.charData[arrayName].splice(idx, 1);
+              saveState();
+              renderList(arrayName, containerId); // Перерисовка
+            };
+          });
+        };
+
+        // Логика Инвентаря
+        if (type === 'inv') {
+          renderList('inventory', '#list-container');
+          const addBtn = modal.querySelector('#add-item-btn');
+          const input = modal.querySelector('#new-item-input');
+          
+          addBtn.onclick = () => {
+            const val = input.value.trim();
+            if (val) {
+              if(!state.user.charData.inventory) state.user.charData.inventory = [];
+              state.user.charData.inventory.push(val);
+              saveState();
+              input.value = '';
+              renderList('inventory', '#list-container');
+              showToast('Предмет добавлен');
+            }
+          };
+        }
+
+        // Логика Заметок
+        if (type === 'notes') {
+          renderList('notes', '#list-container');
+          const addBtn = modal.querySelector('#add-note-btn');
+          const input = modal.querySelector('#new-note-input');
+          
+          addBtn.onclick = () => {
+            const val = input.value.trim();
+            if (val) {
+              if(!state.user.charData.notes) state.user.charData.notes = [];
+              state.user.charData.notes.push(val);
+              saveState();
+              input.value = '';
+              renderList('notes', '#list-container');
+              showToast('Заметка добавлена');
+            }
+          };
+        }
+      }
+
+      // --- Навигация Bottom Bar ---
+      function setActiveNav(name) {
+        els.navItems.forEach(n => n.classList.toggle('active', n.dataset.nav === name));
+      }
+
+      els.navItems.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.dataset.nav;
+          if (target === 'map') {
+            if (!els.app.querySelector('.image-frame')) renderLocationScreen();
+            else els.app.scrollTo({ top: 0, behavior: 'smooth' });
+          } else {
+            openModal(target);
+          }
+        });
+      });
+
+      // Кнопка "Домой"
+      els.btnHome.addEventListener('click', () => {
+        if (confirm('Выйти в главное меню?')) renderMainMenu();
+      });
+
+      return { init };
+    })();
+
+    // Запуск при загрузке
+    document.addEventListener('DOMContentLoaded', APP.init);
+  </script>
 </body>
 </html>
