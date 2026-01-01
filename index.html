@@ -2,53 +2,55 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <meta name="theme-color" content="#3b2d1f" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"/>
+  <meta name="theme-color" content="#1a1614" />
+  <meta name="description" content="D&D Companion App">
   <title>Записки сумасшедшего</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
+  <div class="bg-noise"></div>
+
   <header class="app-header">
+    <div class="header-left">
+      <button id="btn-home" class="icon-btn ghost" aria-label="Меню">
+        <span class="icon">🏰</span>
+      </button>
+    </div>
     <div class="app-title">Записки сумасшедшего</div>
-    <button id="btn-home" class="icon-btn" aria-label="Главное меню" title="Главное меню">🏠</button>
+    <div class="header-right">
+      <div id="char-avatar-mini" class="mini-avatar" hidden></div>
+    </div>
   </header>
 
-  <main id="app" aria-live="polite"></main>
+  <main id="app" class="main-content"></main>
 
-  <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
-  <noscript><div class="noscript">Для запуска приложения включите JavaScript.</div></noscript>
+  <div id="toast" class="toast" hidden></div>
 
-  <!-- ВАЖНО: обычный скрипт с defer (НЕ type="module") -->
+  <nav id="bottom-nav" class="bottom-nav" hidden>
+    <button data-nav="dice" class="nav-item">
+      <span class="nav-icon">🎲</span>
+      <span class="nav-label">Кости</span>
+    </button>
+    <button data-nav="inv" class="nav-item">
+      <span class="nav-icon">🎒</span>
+      <span class="nav-label">Инвент.</span>
+    </button>
+    <button data-nav="notes" class="nav-item">
+      <span class="nav-icon">📜</span>
+      <span class="nav-label">Заметки</span>
+    </button>
+    <button data-nav="map" class="nav-item active">
+      <span class="nav-icon">📍</span>
+      <span class="nav-label">Локация</span>
+    </button>
+  </nav>
+
   <script src="./script.js" defer></script>
-
-  <!-- Лёгкие ловушки ошибок + сторожок пути -->
-  <script>
-    (function () {
-      function showErr(title, msg) {
-        var app = document.getElementById('app');
-        if (!app) return;
-        var box = document.createElement('div');
-        box.className = 'card';
-        box.style.margin = '1rem';
-        box.innerHTML = '<h3>' + title + '</h3><pre style="white-space:pre-wrap;">' + msg + '</pre>';
-        app.prepend(box);
-      }
-      window.addEventListener('error', function (e) {
-        showErr('JS-ошибка', (e.error && e.error.stack) ? e.error.stack : e.message);
-      });
-      window.addEventListener('unhandledrejection', function (e) {
-        showErr('Необработанный промис', (e.reason && e.reason.stack) ? e.reason.stack : String(e.reason));
-      });
-      setTimeout(function () {
-        var app = document.getElementById('app');
-        if (!app || app.childElementCount) return;
-        var base = location.origin + location.pathname.replace(/[^/]*$/, '');
-        app.innerHTML =
-          '<div class="card"><h3>Приложение не загрузилось</h3>' +
-          '<p>Проверь путь к <code>script.js</code> и что файл доступен по адресу:</p>' +
-          '<p><code>' + base + 'script.js</code></p></div>';
-      }, 1500);
-    })();
-  </script>
 </body>
 </html>
