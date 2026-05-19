@@ -2,555 +2,92 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"/>
-  <meta name="theme-color" content="#14100d" />
-  <meta name="description" content="D&D Companion App">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#100c09" />
+  <meta name="description" content="D&D Companion App" />
   <title>Записки сумасшедшего</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg-dark:#090706;--bg-panel:#17110d;--bg-card:#211711;--accent:#d8a848;--accent-2:#8f2f24;--text-main:#f4ead2;--text-muted:#c7b99a;--border:rgba(216,168,72,.28);--glass:rgba(14,10,8,.86);--radius:20px;--safe-area-bottom:env(safe-area-inset-bottom,20px)}
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;font-family:'Lato',sans-serif;background:radial-gradient(circle at 20% 0%,#322016 0,#090706 38%,#050403 100%);color:var(--text-main);height:100dvh;display:flex;flex-direction:column;overflow:hidden}.bg-noise{position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.11;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}.bg-noise:after{content:"";position:fixed;inset:0;background:linear-gradient(135deg,rgba(216,168,72,.08),transparent 35%,rgba(143,47,36,.12));}h1,h2,h3{font-family:'Cinzel',serif;margin:0;font-weight:700;color:var(--accent);letter-spacing:.03em}p{margin:0 0 1rem;line-height:1.65;color:var(--text-muted)}.app-header{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 1rem;background:linear-gradient(180deg,rgba(23,15,10,.95),rgba(10,7,5,.82));backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 12px 30px rgba(0,0,0,.35);z-index:10;flex-shrink:0}.app-title{font-family:'Cinzel',serif;font-weight:700;text-transform:uppercase;color:var(--accent);font-size:.95rem;letter-spacing:.2em}.header-btn{background:rgba(216,168,72,.08);border:1px solid var(--border);border-radius:14px;font-size:1.2rem;cursor:pointer;color:var(--text-muted);padding:.45rem .6rem}.main-content{flex:1;overflow-y:auto;padding:1rem;padding-bottom:calc(92px + var(--safe-area-bottom));scroll-behavior:smooth}.container{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:1.15rem}.hero-menu{min-height:calc(100dvh - 170px);justify-content:center;text-align:center}.hero-sigil{width:126px;height:126px;margin:0 auto 1.25rem;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#4b2918,#120c09 70%);border:1px solid rgba(216,168,72,.55);box-shadow:0 0 60px rgba(216,120,45,.18),inset 0 0 30px rgba(0,0,0,.7);font-size:3rem}.hero-title{font-size:clamp(2.2rem,11vw,4.5rem);line-height:.92;text-shadow:0 8px 25px rgba(0,0,0,.8)}.image-frame{position:relative;background:#030201;border-radius:28px;border:1px solid rgba(216,168,72,.38);overflow:hidden;display:flex;justify-content:center;align-items:center;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.04)}.image-frame:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.45));z-index:1}.image-frame img{width:100%;height:auto;max-height:58vh;object-fit:cover;display:block;opacity:0;transition:opacity .45s ease,transform 8s ease}.image-frame img.loaded{opacity:1;transform:scale(1.025)}.card{background:linear-gradient(180deg,rgba(42,29,20,.96),rgba(23,16,12,.98));border:1px solid var(--border);border-radius:var(--radius);padding:1.15rem;box-shadow:0 14px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.04)}.location-card h2{font-size:1.85rem;margin-bottom:.75rem}.location-meta{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem}.pill{border:1px solid rgba(216,168,72,.35);background:rgba(216,168,72,.08);border-radius:999px;padding:.35rem .65rem;color:#ead9a9;font-size:.78rem}.btn{width:100%;border:0;border-radius:16px;padding:1rem 1.1rem;margin:.35rem 0;background:linear-gradient(135deg,#d8a848,#8f5c22);color:#17100b;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 10px 22px rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.04em}.btn.ghost{background:rgba(216,168,72,.06);color:var(--accent);border:1px solid var(--border);box-shadow:none}.btn-group{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1rem}.grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:1rem}.char-card{text-align:center;transition:.2s transform}.char-card:active{transform:scale(.98)}.char-card img{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);box-shadow:0 0 25px rgba(216,168,72,.18)}.stats-scroller{display:flex;gap:.75rem;overflow-x:auto;padding:.35rem 0 .7rem;scroll-snap-type:x mandatory}.stat-card{flex:0 0 128px;scroll-snap-align:start;background:rgba(9,7,6,.62);border:1px solid var(--border);border-radius:16px;padding:.8rem;text-align:center}.stat-label{display:block;color:var(--text-muted);font-size:.75rem;margin-bottom:.45rem}.stepper{display:flex;align-items:center;justify-content:space-between;gap:.4rem}.stepper button{width:32px;height:32px;border-radius:10px;border:1px solid var(--border);background:rgba(216,168,72,.1);color:var(--accent);font-size:1.2rem}.stepper span{font-weight:800;color:#fff}.bottom-nav{position:fixed;left:.75rem;right:.75rem;bottom:calc(.75rem + var(--safe-area-bottom));height:66px;display:grid;grid-template-columns:repeat(4,1fr);gap:.35rem;background:rgba(12,8,6,.9);border:1px solid var(--border);border-radius:24px;padding:.45rem;backdrop-filter:blur(16px);z-index:20;box-shadow:0 16px 40px rgba(0,0,0,.5)}.nav-item{border:0;background:transparent;color:var(--text-muted);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;font-size:.72rem}.nav-item.active{background:linear-gradient(135deg,rgba(216,168,72,.22),rgba(143,47,36,.18));color:var(--accent)}.nav-icon{font-size:1.25rem}.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:grid;place-items:end center;padding:1rem;z-index:50;opacity:0;pointer-events:none;transition:.22s}.modal.open{opacity:1;pointer-events:auto}.modal-content{width:min(720px,100%);max-height:82dvh;overflow:auto;background:linear-gradient(180deg,#241710,#100b08);border:1px solid var(--border);border-radius:26px;padding:1.2rem;box-shadow:0 20px 60px rgba(0,0,0,.65)}input,textarea{width:100%;background:#0c0907;color:var(--text-main);border:1px solid var(--border);border-radius:14px;padding:.9rem}.toast{position:fixed;left:50%;bottom:calc(94px + var(--safe-area-bottom));transform:translateX(-50%) translateY(20px);background:#211711;border:1px solid var(--border);color:var(--accent);padding:.75rem 1rem;border-radius:999px;opacity:0;transition:.25s;z-index:80}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}@media(min-width:760px){.main-content{padding:1.5rem}.location-layout{display:grid;grid-template-columns:1.05fr .95fr;align-items:start}.image-frame{position:sticky;top:1rem}.btn-group .btn{margin:0}}
-</style>
+    :root{
+      --bg:#100c09; --bg2:#17100d; --panel:#211812; --panel2:#2d2118;
+      --ink:#f3eadc; --muted:#b9a98f; --soft:#7d6b52;
+      --gold:#d8bd78; --gold2:#9b7738; --red:#9d2d22; --blue:#172739;
+      --border:rgba(216,189,120,.34); --shadow:0 18px 50px rgba(0,0,0,.45);
+      --safe:env(safe-area-inset-bottom, 18px); --radius:22px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Lato,system-ui,sans-serif;overflow:hidden}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;background:
+      radial-gradient(circle at 20% 5%,rgba(216,189,120,.16),transparent 28%),
+      radial-gradient(circle at 80% 30%,rgba(115,40,28,.24),transparent 34%),
+      linear-gradient(180deg,#0b0806,#1b120e 48%,#0b0806);z-index:-3}
+    body:after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.08;z-index:-2;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.75' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+    h1,h2,h3{font-family:Cinzel,serif;color:var(--gold);margin:0;letter-spacing:.04em} p{margin:0;color:var(--muted);line-height:1.55}.muted{color:var(--muted)}
+    .app-header{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:linear-gradient(180deg,rgba(31,22,16,.96),rgba(15,10,8,.88));border-bottom:1px solid var(--border);box-shadow:0 8px 25px rgba(0,0,0,.28);z-index:20;position:relative;flex-shrink:0}
+    .app-title{font-family:Cinzel,serif;font-weight:900;color:var(--gold);text-transform:uppercase;font-size:.95rem;letter-spacing:.14em;text-align:center}.header-btn{border:1px solid rgba(216,189,120,.18);background:rgba(255,255,255,.03);color:var(--gold);border-radius:14px;font-size:1.15rem;width:42px;height:42px;display:grid;place-items:center;cursor:pointer}.char-indicator{width:42px;height:42px;border-radius:14px;background:#000 center/cover;border:1px solid var(--gold);box-shadow:0 0 0 3px rgba(216,189,120,.08);cursor:pointer}
+    .main-content{height:calc(100dvh - 64px);overflow:auto;padding:16px 14px calc(92px + var(--safe));scroll-behavior:smooth}.container{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}.wide{max-width:1160px}
+    .hero{position:relative;min-height:calc(100dvh - 96px - var(--safe));display:flex;align-items:center;justify-content:center;padding:26px 0 96px}.hero-panel{width:100%;max-width:780px;position:relative;border:1px solid var(--border);border-radius:32px;overflow:hidden;background:rgba(20,13,9,.78);box-shadow:var(--shadow)}
+    .hero-panel:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,4,3,.16),rgba(5,4,3,.86)),url('images/collegium.jpg') center/cover;opacity:.56;z-index:0}.hero-inner{position:relative;z-index:1;padding:34px 22px 24px;text-align:center}.crest{width:82px;height:82px;margin:0 auto 18px;border:1px solid var(--border);border-radius:24px;display:grid;place-items:center;background:radial-gradient(circle,rgba(216,189,120,.22),rgba(11,7,5,.65));box-shadow:inset 0 0 24px rgba(216,189,120,.08),0 10px 30px rgba(0,0,0,.4);font-size:2.2rem}.hero h1{font-size:clamp(2.2rem,9vw,4.8rem);line-height:.92;text-shadow:0 6px 28px #000}.hero .subtitle{text-transform:uppercase;letter-spacing:.24em;font-size:.75rem;color:#e7d1a0;margin:18px 0 22px}.hero-actions{display:grid;gap:10px;max-width:380px;margin:22px auto 0}
+    .btn{width:100%;border:0;border-radius:16px;padding:14px 16px;font-family:Cinzel,serif;font-weight:800;font-size:.98rem;letter-spacing:.04em;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1b1008;cursor:pointer;box-shadow:0 12px 24px rgba(0,0,0,.32)}.btn:active{transform:scale(.98)}.btn.ghost{background:rgba(10,7,5,.42);border:1px solid var(--border);color:var(--gold);box-shadow:none}.btn.small{padding:10px 12px;font-size:.8rem}.btn.danger{width:auto;padding:7px 10px;background:rgba(157,45,34,.12);border:1px solid rgba(157,45,34,.5);color:#ff8c78;font-family:Lato,sans-serif}
+    .section-title{display:flex;align-items:center;gap:12px}.section-title:before,.section-title:after{content:"";height:1px;background:linear-gradient(90deg,transparent,var(--border));flex:1}.section-title:before{background:linear-gradient(90deg,var(--border),transparent)}
+    .card{background:linear-gradient(180deg,rgba(46,33,24,.94),rgba(28,20,15,.96));border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.3);position:relative;overflow:hidden}.card:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(216,189,120,.13),transparent 22%,transparent 78%,rgba(216,189,120,.08));opacity:.8}.card>*{position:relative}.location-card h2{font-size:1.65rem;margin-bottom:12px}.location-card p{font-size:1.04rem;color:#ddcdb4}
+    .image-frame{width:100%;border-radius:26px;border:1px solid var(--border);background:#060403;overflow:hidden;box-shadow:var(--shadow);position:relative}.image-frame:after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),inset 0 0 60px rgba(0,0,0,.5)}.image-frame img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;opacity:0;transition:.35s}.image-frame img.loaded{opacity:1}.btn-group{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.btn-group .single{grid-column:1/-1}
+    .char-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}.hero-option{padding:0;overflow:hidden;cursor:pointer;background:linear-gradient(180deg,rgba(37,26,18,.95),rgba(17,12,9,.98));transition:.18s}.hero-option:hover{transform:translateY(-2px)}.hero-option .card-art{width:100%;aspect-ratio:1055/1491;object-fit:cover;object-position:top center;display:block;background:#050403}.hero-option .hero-meta{padding:14px}.hero-option h3{font-size:1.15rem}.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(216,189,120,.28);background:rgba(216,189,120,.08);border-radius:999px;padding:5px 9px;color:#e7d1a0;font-size:.72rem;margin-top:8px}.hero-card-row{display:grid;grid-template-columns:86px 1fr;gap:14px;align-items:center}.hero-avatar{width:86px;height:86px;border-radius:18px;object-fit:cover;border:1px solid var(--border);box-shadow:0 10px 20px rgba(0,0,0,.24)}.active-hero-card{display:grid;grid-template-columns:100px 1fr;gap:14px;align-items:center}.active-hero-card img{width:100px;height:140px;object-fit:cover;object-position:top center;border-radius:14px;border:1px solid var(--border)}
+    .stats-scroller{display:flex;gap:10px;overflow:auto;padding:4px 2px 10px;scroll-snap-type:x mandatory}.stat-card{flex:0 0 132px;scroll-snap-align:start;background:linear-gradient(180deg,#1b242b,#14100d);border:1px solid rgba(216,189,120,.24);border-radius:16px;padding:12px;display:grid;gap:8px;justify-items:center}.stat-label{text-transform:uppercase;color:#d1bc86;font-size:.72rem;letter-spacing:.08em}.stepper{display:grid;grid-template-columns:32px 42px 32px;align-items:center;background:#0d0907;border:1px solid rgba(216,189,120,.12);border-radius:12px;overflow:hidden}.stepper button{height:34px;border:0;background:transparent;color:var(--gold);font-size:1.1rem}.stepper span{text-align:center;font-weight:900;color:#fff}
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(72px + var(--safe));padding:7px 4px var(--safe);display:flex;align-items:center;justify-content:space-around;background:linear-gradient(180deg,rgba(31,22,16,.96),rgba(12,8,6,.98));border-top:1px solid var(--border);box-shadow:0 -12px 32px rgba(0,0,0,.4);z-index:100}.nav-item{background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px;font-size:.68rem;cursor:pointer}.nav-icon{font-size:1.32rem;filter:grayscale(1);opacity:.8}.nav-item.active{color:var(--gold)}.nav-item.active .nav-icon{filter:grayscale(0);opacity:1}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:300;display:flex;align-items:center;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:.18s;backdrop-filter:blur(7px)}.modal.open{opacity:1;pointer-events:auto}.modal-content{width:min(940px,100%);max-height:90dvh;overflow:auto;border:1px solid var(--border);border-radius:24px;background:linear-gradient(180deg,#201710,#100b08);box-shadow:var(--shadow);padding:18px}.modal-card-image{display:block;width:100%;max-width:760px;margin:0 auto;border-radius:18px;border:1px solid var(--border);box-shadow:0 18px 50px rgba(0,0,0,.44)}.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.list-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border-bottom:1px solid rgba(216,189,120,.13);background:rgba(0,0,0,.18);border-radius:12px;margin:6px 0}.input-field{width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:#0b0806;color:#fff;font:inherit}textarea.input-field{min-height:88px;resize:vertical}.toast{position:fixed;left:50%;bottom:calc(96px + var(--safe));transform:translateX(-50%) translateY(10px);background:#f0dcc0;color:#160c08;border-radius:999px;padding:10px 18px;font-weight:900;opacity:0;pointer-events:none;transition:.22s;z-index:400}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}[hidden]{display:none!important}
+    @media (max-width:640px){.main-content{padding-left:12px;padding-right:12px}.char-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.hero-option .hero-meta{padding:10px}.hero-option h3{font-size:.98rem}.active-hero-card{grid-template-columns:82px 1fr}.active-hero-card img{width:82px;height:118px}.modal-actions{grid-template-columns:1fr}.btn-group{grid-template-columns:1fr}.hero-inner{padding:28px 16px 22px}.location-card h2{font-size:1.35rem}.location-card p{font-size:.98rem}.modal-content{padding:12px;border-radius:20px}.modal-card-image{border-radius:14px}}
+  </style>
 </head>
 <body>
-  <div class="bg-noise"></div>
-
   <header class="app-header">
     <button id="btn-home" class="header-btn" title="Главное меню">🏰</button>
-    <div class="app-title">Записки</div>
-    <div id="char-indicator" style="width:32px; height:32px; border-radius:50%; background:#333; background-size:cover; border:1px solid var(--accent)" hidden></div>
+    <div class="app-title">Записки сумасшедшего</div>
+    <button id="char-indicator" class="char-indicator" hidden title="Карточка героя"></button>
   </header>
-
   <main id="app" class="main-content"></main>
-
   <div id="toast" class="toast">Сохранено</div>
-
   <nav id="bottom-nav" class="bottom-nav" hidden>
-    <button data-nav="dice" class="nav-item">
-      <span class="nav-icon">🎲</span>
-      <span>D20</span>
-    </button>
-    <button data-nav="inv" class="nav-item">
-      <span class="nav-icon">🎒</span>
-      <span>Сумка</span>
-    </button>
-    <button data-nav="notes" class="nav-item">
-      <span class="nav-icon">📜</span>
-      <span>Лор</span>
-    </button>
-    <button data-nav="map" class="nav-item active">
-      <span class="nav-icon">📍</span>
-      <span>Карта</span>
-    </button>
+    <button data-nav="map" class="nav-item active"><span class="nav-icon">🗺️</span><span>Карта</span></button>
+    <button data-nav="hero" class="nav-item"><span class="nav-icon">🛡️</span><span>Герой</span></button>
+    <button data-nav="dice" class="nav-item"><span class="nav-icon">🎲</span><span>Кости</span></button>
+    <button data-nav="inv" class="nav-item"><span class="nav-icon">🎒</span><span>Вещи</span></button>
+    <button data-nav="notes" class="nav-item"><span class="nav-icon">📜</span><span>Заметки</span></button>
   </nav>
-
   <script>
-    /* ===== JAVASCRIPT LOGIC ===== */
-    const APP = (() => {
-      // Кэшируем элементы DOM
-      const els = {
-        app: document.getElementById('app'),
-        toast: document.getElementById('toast'),
-        btnHome: document.getElementById('btn-home'),
-        bottomNav: document.getElementById('bottom-nav'),
-        charIndicator: document.getElementById('char-indicator'),
-        navItems: document.querySelectorAll('.nav-item')
-      };
-
-      const STORAGE_KEY = 'dnd_companion_v3';
-
-      // Глобальное состояние
-      let state = {
-        data: { characters: [], locations: [] },
-        user: {
-          selectedCharId: null,
-          charData: null, // Здесь храним статы, инвентарь и заметки
-          locationIndex: 0
-        }
-      };
-
-      // --- Утилиты ---
-      const showToast = (msg) => {
-        els.toast.textContent = msg;
-        els.toast.classList.add('show');
-        setTimeout(() => els.toast.classList.remove('show'), 2000);
-      };
-
-      const saveState = () => {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
-        } catch(e) { console.error('Save failed', e); }
-      };
-
-      const loadState = () => {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          try {
-            const parsed = JSON.parse(raw);
-            if (parsed.charData) state.user = parsed;
-          } catch(e) {}
-        }
-      };
-
-      // --- Инициализация ---
-      async function init() {
-        try {
-          // Загрузка данных
-          const [charsRes, locsRes] = await Promise.all([
-            fetch('./characters.json'),
-            fetch('./locations.json')
-          ]);
-
-          if (!charsRes.ok || !locsRes.ok) throw new Error("JSON files not found");
-
-          const charsData = await charsRes.json();
-          const locsData = await locsRes.json();
-
-          state.data.characters = charsData.characters || [];
-          state.data.locations = locsData.locations || [];
-
-          loadState();
-
-          // Роутинг
-          if (state.user.selectedCharId && state.user.charData) {
-            renderLocationScreen();
-          } else {
-            renderMainMenu();
-          }
-        } catch (e) {
-          els.app.innerHTML = `
-            <div class="container" style="text-align:center">
-              <div class="card">
-                <h3>Ошибка запуска</h3>
-                <p>Не удалось загрузить данные (characters.json / locations.json).</p>
-                <p style="font-size:0.8rem; color:red">${e.message}</p>
-                <button class="btn" onclick="location.reload()">Повторить</button>
-              </div>
-            </div>`;
-        }
-      }
-
-      // --- Рендеринг: Главное меню ---
-      function renderMainMenu() {
-        els.bottomNav.hidden = true;
-        els.charIndicator.hidden = true;
-
-        els.app.innerHTML = `
-          <div class="container hero-menu">
-            <div class="hero-sigil">⚔️</div>
-            <h1 class="hero-title">Записки<br>Сумасшедшего</h1>
-            <p>Премиальный D&D-журнал приключения: герой, карта, кости, заметки и инвентарь.</p>
-            <div style="margin-top:2rem;">
-              <button class="btn" id="btn-new-game">Новая игра</button>
-              ${state.user.charData ? `<button class="btn ghost" id="btn-continue">Продолжить</button>` : ''}
-            </div>
-          </div>
-        `;
-
-        document.getElementById('btn-new-game').onclick = renderCharSelect;
-        const btnCont = document.getElementById('btn-continue');
-        if (btnCont) btnCont.onclick = renderLocationScreen;
-      }
-
-      // --- Рендеринг: Выбор персонажа ---
-      function renderCharSelect() {
-        els.app.innerHTML = `
-          <div class="container">
-            <h2 style="text-align:center">Выберите героя</h2>
-            <div class="grid-cards" id="char-grid"></div>
-            <button class="btn ghost" id="back-to-menu">Назад</button>
-          </div>
-        `;
-
-        const grid = document.getElementById('char-grid');
-        const hiddenIds = ['korgreyv', 'porje', 'andrey'];
-
-        state.data.characters.forEach(char => {
-          if (hiddenIds.includes(String(char.id))) return;
-
-          const card = document.createElement('div');
-          card.className = 'card char-card';
-          card.style.cursor = 'pointer';
-          card.innerHTML = `
-            <img src="images/${char.image}" alt="${char.name}">
-            <h3 style="margin-top:0.5rem; font-size:1rem">${char.name}</h3>
-            <p style="font-size:0.8rem; margin:0">${char.class}</p>
-          `;
-          card.onclick = () => startGame(char);
-          grid.appendChild(card);
-        });
-
-        document.getElementById('back-to-menu').onclick = renderMainMenu;
-      }
-
-      function startGame(char) {
-        // Создаем глубокую копию, чтобы изменения не трогали исходный JSON
-        state.user.charData = JSON.parse(JSON.stringify(char));
-        // Инициализируем пустые массивы, если их нет
-        if (!state.user.charData.inventory) state.user.charData.inventory = [];
-        if (!state.user.charData.notes) state.user.charData.notes = [];
-
-        state.user.selectedCharId = char.id;
-        state.user.locationIndex = 0;
-
-        saveState();
-        renderLocationScreen();
-      }
-
-      // --- Рендеринг: Локация (Основной экран) ---
-      function renderLocationScreen() {
-        const loc = state.data.locations[state.user.locationIndex];
-        if (!loc) return;
-
-        // UI обновления
-        els.bottomNav.hidden = false;
-        setActiveNav('map');
-
-        if (state.user.charData?.image) {
-          els.charIndicator.hidden = false;
-          els.charIndicator.style.backgroundImage = `url('images/${state.user.charData.image}')`;
-        }
-
-        // Предзагрузка
-        if (state.user.locationIndex + 1 < state.data.locations.length) {
-          new Image().src = `images/${state.data.locations[state.user.locationIndex + 1].image}`;
-        }
-
-        els.app.innerHTML = '';
-        const container = document.createElement('div');
-        container.className = 'container location-layout';
-
-        // 1. Изображение
-        const imgFrame = document.createElement('div');
-        imgFrame.className = 'image-frame';
-        const img = new Image();
-        img.src = `images/${loc.image}`;
-        img.onload = () => img.classList.add('loaded');
-        img.onerror = () => { img.classList.add('loaded'); }; // Заглушку убрал для эстетики
-        imgFrame.appendChild(img);
-        container.appendChild(imgFrame);
-
-        // --- ЛОГИКА ПОЯВЛЕНИЯ НОВЫХ ПЕРСОНАЖЕЙ ---
-        const showUnlockBtn = String(loc.title || '').toLowerCase().includes('коллегия магов');
-
-        // 2. Текст и навигация
-        const card = document.createElement('div');
-        card.className = 'card location-card';
-        card.innerHTML = `
-          <div class="location-meta"><span class="pill">Локация ${state.user.locationIndex + 1} / ${state.data.locations.length}</span><span class="pill">D&D Encounter</span></div>
-          <h2>${loc.title}</h2>
-          <p>${loc.description}</p>
-
-          ${showUnlockBtn ? `<button class="btn ghost" id="btn-unlock" style="border-color:var(--accent); margin-top:1rem">👥 Встретить новых спутников</button>` : ''}
-
-          <div class="btn-group">
-            ${state.user.locationIndex > 0 ? `<button class="btn ghost" id="prev-loc">← Назад</button>` : '<div></div>'}
-            ${state.user.locationIndex < state.data.locations.length - 1 ? `<button class="btn" id="next-loc">Вперёд →</button>` : ''}
-          </div>
-        `;
-        container.appendChild(card);
-
-        // 3. Характеристики (Скролл)
-        const statsWrap = document.createElement('div');
-        statsWrap.innerHTML = `<h3>Характеристики</h3>`;
-        const scroller = document.createElement('div');
-        scroller.className = 'stats-scroller';
-
-        Object.entries(state.user.charData.stats || {}).forEach(([key, val]) => {
-          const statItem = document.createElement('div');
-          statItem.className = 'stat-card';
-          statItem.innerHTML = `
-            <span class="stat-label">${key}</span>
-            <div class="stepper">
-              <button data-action="dec" data-key="${key}">−</button>
-              <span>${val}</span>
-              <button data-action="inc" data-key="${key}">+</button>
-            </div>
-          `;
-          scroller.appendChild(statItem);
-        });
-
-        // Делегирование кликов по статам
-        scroller.onclick = (e) => {
-          const btn = e.target.closest('button');
-          if (!btn) return;
-          const key = btn.dataset.key;
-          const span = btn.parentElement.querySelector('span');
-          let currentVal = parseInt(span.textContent);
-
-          if (btn.dataset.action === 'inc') currentVal++;
-          else currentVal--;
-
-          span.textContent = currentVal;
-          state.user.charData.stats[key] = currentVal;
-          saveState();
-        };
-
-        statsWrap.appendChild(scroller);
-        container.appendChild(statsWrap);
-        els.app.appendChild(container);
-
-        // Листенеры кнопок
-        document.getElementById('prev-loc')?.addEventListener('click', () => {
-          state.user.locationIndex--;
-          saveState();
-          els.app.scrollTo(0, 0);
-          renderLocationScreen();
-        });
-        document.getElementById('next-loc')?.addEventListener('click', () => {
-          state.user.locationIndex++;
-          saveState();
-          els.app.scrollTo(0, 0);
-          renderLocationScreen();
-        });
-
-        // Листенер для секретной кнопки
-        if (showUnlockBtn) {
-          document.getElementById('btn-unlock')?.addEventListener('click', openUnlockModal);
-        }
-      }
-
-      // --- Модальные окна и логика ---
-      function openModal(type) {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-
-        let content = '';
-
-        // --- КОСТИ ---
-        if (type === 'dice') {
-          content = `
-            <h3>Бросок костей</h3>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:1rem 0">
-              ${['D4','D6','D8','D10','D12','D20'].map(d => `<button class="btn ghost dice-btn" data-d="${d}">${d}</button>`).join('')}
-            </div>
-            <div id="dice-log" class="card" style="height:150px; overflow-y:auto; font-family:monospace; font-size:0.9rem; background:#111"></div>
-            <button class="btn" id="close-modal" style="margin-top:1rem">Закрыть</button>
-          `;
-        }
-
-        // --- ИНВЕНТАРЬ ---
-        else if (type === 'inv') {
-          content = `
-            <h3>Инвентарь</h3>
-            <div style="display:flex; gap:0.5rem; margin-bottom:1rem">
-              <input id="new-item-input" class="input-field" placeholder="Название предмета...">
-              <button id="add-item-btn" class="btn" style="width:auto; margin:0">+</button>
-            </div>
-            <div id="list-container" style="max-height:50vh; overflow-y:auto"></div>
-            <button class="btn ghost" id="close-modal" style="margin-top:1rem">Закрыть</button>
-          `;
-        }
-
-        // --- ЗАМЕТКИ ---
-        else if (type === 'notes') {
-          content = `
-            <h3>Заметки</h3>
-            <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem">
-              <textarea id="new-note-input" class="input-field" placeholder="Текст заметки..."></textarea>
-              <button id="add-note-btn" class="btn">Добавить заметку</button>
-            </div>
-            <div id="list-container" style="max-height:40vh; overflow-y:auto"></div>
-            <button class="btn ghost" id="close-modal" style="margin-top:1rem">Закрыть</button>
-          `;
-        }
-
-        modal.innerHTML = `<div class="modal-content">${content}</div>`;
-        document.body.appendChild(modal);
-        setTimeout(() => modal.classList.add('open'), 10);
-
-        // --- Логика внутри модалки ---
-        const closeModal = () => {
-          modal.classList.remove('open');
-          setTimeout(() => modal.remove(), 250);
-        };
-
-        modal.addEventListener('click', (e) => {
-          if (e.target === modal || e.target.id === 'close-modal') closeModal();
-
-          // Логика костей
-          if (e.target.classList.contains('dice-btn')) {
-            const die = e.target.dataset.d;
-            const max = parseInt(die.substring(1));
-            const res = Math.floor(Math.random() * max) + 1;
-            const log = modal.querySelector('#dice-log');
-            log.innerHTML = `<div style="padding:5px; border-bottom:1px solid #333">🎲 <strong>${die}</strong>: <span style="color:var(--accent); font-weight:bold">${res}</span></div>` + log.innerHTML;
-          }
-        });
-
-        // Функция рендера списков (Инвентарь / Заметки)
-        const renderList = (arrayName, containerId) => {
-          const container = modal.querySelector(containerId);
-          if (!container) return;
-
-          const list = state.user.charData[arrayName] || [];
-          container.innerHTML = '';
-
-          if (list.length === 0) {
-            container.innerHTML = '<p style="text-align:center; opacity:0.5">Пусто</p>';
-            return;
-          }
-
-          list.forEach((item, index) => {
-            const row = document.createElement('div');
-            row.className = 'list-item';
-            row.innerHTML = `
-              <div class="list-text">${item}</div>
-              <button class="btn danger" data-del="${index}">✖</button>
-            `;
-            container.appendChild(row);
-          });
-
-          // Навешиваем обработчики удаления
-          container.querySelectorAll('button[data-del]').forEach(btn => {
-            btn.onclick = () => {
-              const idx = parseInt(btn.dataset.del);
-              state.user.charData[arrayName].splice(idx, 1);
-              saveState();
-              renderList(arrayName, containerId); // Перерисовка
-            };
-          });
-        };
-
-        // Логика Инвентаря
-        if (type === 'inv') {
-          renderList('inventory', '#list-container');
-          const addBtn = modal.querySelector('#add-item-btn');
-          const input = modal.querySelector('#new-item-input');
-
-          addBtn.onclick = () => {
-            const val = input.value.trim();
-            if (val) {
-              if(!state.user.charData.inventory) state.user.charData.inventory = [];
-              state.user.charData.inventory.push(val);
-              saveState();
-              input.value = '';
-              renderList('inventory', '#list-container');
-              showToast('Предмет добавлен');
-            }
-          };
-        }
-
-        // Логика Заметок
-        if (type === 'notes') {
-          renderList('notes', '#list-container');
-          const addBtn = modal.querySelector('#add-note-btn');
-          const input = modal.querySelector('#new-note-input');
-
-          addBtn.onclick = () => {
-            const val = input.value.trim();
-            if (val) {
-              if(!state.user.charData.notes) state.user.charData.notes = [];
-              state.user.charData.notes.push(val);
-              saveState();
-              input.value = '';
-              renderList('notes', '#list-container');
-              showToast('Заметка добавлена');
-            }
-          };
-        }
-      }
-
-      // --- Секретные персонажи ---
-      function openUnlockModal() {
-        const secretIds = ['korgreyv', 'porje'];
-
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-
-        const charsHTML = (state.data.characters || [])
-          .filter(c => secretIds.includes(String(c.id)))
-          .map(c => {
-            const desc = String(c.description || '');
-            const shortDesc = desc ? `${desc.substring(0, 80)}...` : 'Описание скрыто...';
-
-            return `
-              <div class="card" style="margin-bottom:1rem; text-align:center">
-                <img src="images/${c.image}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:0.5rem">
-                <h3>${c.name}</h3>
-                <p style="font-size:0.9rem">${shortDesc}</p>
-                <button class="btn" onclick="APP.switchCharacter('${c.id}')">Выбрать этого героя</button>
-              </div>
-            `;
-          }).join('');
-
-        modal.innerHTML = `
-          <div class="modal-content">
-            <h3 style="text-align:center; margin-bottom:1rem">Новые союзники</h3>
-            ${charsHTML || `<p style="text-align:center; opacity:0.7">Нет доступных персонажей</p>`}
-            <button class="btn ghost" id="close-modal">Отмена</button>
-          </div>
-        `;
-
-        document.body.appendChild(modal);
-        setTimeout(() => modal.classList.add('open'), 10);
-
-        modal.querySelector('#close-modal').onclick = () => {
-          modal.classList.remove('open');
-          setTimeout(() => modal.remove(), 250);
-        };
-      }
-
-      // Переключение персонажа (публично через APP.switchCharacter)
-      function switchCharacter(newId) {
-        const newChar = (state.data.characters || []).find(c => String(c.id) === String(newId));
-        if (!newChar) return;
-
-        if (confirm(`Сменить персонажа на ${newChar.name}? Инвентарь и заметки будут его.`)) {
-          const currentLoc = state.user.locationIndex;
-
-          state.user.charData = JSON.parse(JSON.stringify(newChar));
-          if (!state.user.charData.inventory) state.user.charData.inventory = [];
-          if (!state.user.charData.notes) state.user.charData.notes = [];
-
-          state.user.selectedCharId = newChar.id;
-          state.user.locationIndex = currentLoc;
-
-          saveState();
-
-          const m = document.querySelector('.modal');
-          if (m) m.remove();
-
-          showToast(`Вы теперь: ${newChar.name}`);
-          renderLocationScreen();
-        }
-      }
-
-      // --- Навигация Bottom Bar ---
-      function setActiveNav(name) {
-        els.navItems.forEach(n => n.classList.toggle('active', n.dataset.nav === name));
-      }
-
-      els.navItems.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const target = btn.dataset.nav;
-          if (target === 'map') {
-            if (!els.app.querySelector('.image-frame')) renderLocationScreen();
-            else els.app.scrollTo({ top: 0, behavior: 'smooth' });
-          } else {
-            openModal(target);
-          }
-        });
-      });
-
-      // Кнопка "Домой"
-      els.btnHome.addEventListener('click', () => {
-        if (confirm('Выйти в главное меню?')) renderMainMenu();
-      });
-
-      // ВАЖНО: отдаем switchCharacter наружу, чтобы работал onclick="APP.switchCharacter(...)"
-      return { init, switchCharacter };
+    const APP=(()=>{
+      const els={app:document.getElementById('app'),toast:document.getElementById('toast'),btnHome:document.getElementById('btn-home'),bottomNav:document.getElementById('bottom-nav'),charIndicator:document.getElementById('char-indicator'),navItems:[...document.querySelectorAll('.nav-item')]};
+      const STORAGE_KEY='dnd_companion_premium_cards_v1';
+      let state={data:{characters:[],locations:[]},user:{selectedCharId:null,charData:null,locationIndex:0}};
+      const esc=v=>String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
+      const imgPath=name=>`images/${encodeURIComponent(name)}`.replace(/%2F/g,'/');
+      const showToast=msg=>{els.toast.textContent=msg;els.toast.classList.add('show');setTimeout(()=>els.toast.classList.remove('show'),1800)};
+      const saveState=()=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state.user))}catch(e){}};
+      const loadState=()=>{try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);if(parsed?.charData)state.user={...state.user,...parsed}}}catch(e){}};
+      async function init(){try{const [cr,lr]=await Promise.all([fetch('./characters.json'),fetch('./locations.json')]);if(!cr.ok||!lr.ok)throw new Error('Не удалось загрузить JSON');state.data.characters=(await cr.json()).characters||[];state.data.locations=(await lr.json()).locations||[];loadState();if(state.user.selectedCharId&&state.user.charData)renderLocationScreen();else renderMainMenu()}catch(e){els.app.innerHTML=`<div class="container"><div class="card" style="text-align:center"><h3>Ошибка запуска</h3><p>Не удалось загрузить данные приложения.</p><p style="color:#ff8c78">${esc(e.message)}</p><button class="btn" onclick="location.reload()">Повторить</button></div></div>`}}
+      function setActiveNav(name){els.navItems.forEach(n=>n.classList.toggle('active',n.dataset.nav===name))}
+      function renderMainMenu(){els.bottomNav.hidden=true;els.charIndicator.hidden=true;els.app.innerHTML=`<div class="hero"><div class="hero-panel"><div class="hero-inner"><div class="crest">⚜️</div><h1>Записки<br>Сумасшедшего</h1><p class="subtitle">D&D companion • Hardwinn</p><p>Премиальное приложение-проводник по локациям, героям, инвентарю, заметкам и броскам костей.</p><div class="hero-actions"><button class="btn" id="btn-new-game">Новая игра</button>${state.user.charData?`<button class="btn ghost" id="btn-continue">Продолжить</button>`:''}</div></div></div></div><div class="container wide"><div class="section-title"><h2>Карточки персонажей</h2></div><div class="char-grid">${state.data.characters.map(charCardMini).join('')}</div></div>`;document.getElementById('btn-new-game').onclick=renderCharSelect;document.getElementById('btn-continue')?.addEventListener('click',renderLocationScreen);bindCharacterPreviewButtons(false)}
+      function charCardMini(c){return`<article class="card hero-option" data-card-id="${esc(c.id)}"><img class="card-art" src="${imgPath(c.cardImage||c.image)}" alt="${esc(c.name)}"><div class="hero-meta"><h3>${esc(c.name)}</h3><p>${esc(c.class)}</p>${c.availableFromStart?`<span class="pill">доступен сразу</span>`:`<span class="pill">${esc(c.unlockHint||'сюжетный герой')}</span>`}</div></article>`}
+      function bindCharacterPreviewButtons(allowStart){document.querySelectorAll('[data-card-id]').forEach(node=>{node.onclick=()=>{const c=state.data.characters.find(x=>String(x.id)===String(node.dataset.cardId));if(c)openCharacterCard(c,{allowStart})}})}
+      function renderCharSelect(){els.bottomNav.hidden=true;els.charIndicator.hidden=true;const list=state.data.characters.filter(c=>c.availableFromStart!==false);els.app.innerHTML=`<div class="container wide"><div class="section-title"><h2>Выберите героя</h2></div><p style="text-align:center">Нажмите на карточку, чтобы открыть её полностью и начать игру.</p><div class="char-grid">${list.map(charCardMini).join('')}</div><button class="btn ghost" id="back-to-menu">Назад</button></div>`;document.getElementById('back-to-menu').onclick=renderMainMenu;bindCharacterPreviewButtons(true)}
+      function startGame(char){state.user.charData=JSON.parse(JSON.stringify(char));state.user.selectedCharId=char.id;state.user.locationIndex=0;if(!state.user.charData.inventory)state.user.charData.inventory=[];if(!state.user.charData.notes)state.user.charData.notes=[];saveState();document.querySelector('.modal')?.remove();renderLocationScreen();showToast(`Выбран герой: ${char.name}`)}
+      function renderLocationScreen(){const loc=state.data.locations[state.user.locationIndex];if(!loc)return;els.bottomNav.hidden=false;setActiveNav('map');if(state.user.charData?.image){els.charIndicator.hidden=false;els.charIndicator.style.backgroundImage=`url('${imgPath(state.user.charData.image)}')`}if(state.user.locationIndex+1<state.data.locations.length)new Image().src=imgPath(state.data.locations[state.user.locationIndex+1].image);els.app.innerHTML='';const container=document.createElement('div');container.className='container';container.innerHTML=`<div class="image-frame"><img id="loc-img" src="${imgPath(loc.image)}" alt="${esc(loc.title)}"></div><section class="card location-card"><h2>${esc(loc.title)}</h2><p>${esc(loc.description)}</p>${isCollege(loc)?`<button class="btn ghost" id="btn-unlock">👥 Встретить новых спутников</button>`:''}<div class="btn-group">${state.user.locationIndex>0?`<button class="btn ghost" id="prev-loc">← Назад</button>`:''}${state.user.locationIndex<state.data.locations.length-1?`<button class="btn" id="next-loc">Вперёд →</button>`:''}</div></section><section class="card"><div class="active-hero-card"><img src="${imgPath(state.user.charData.cardImage||state.user.charData.image)}" alt="${esc(state.user.charData.name)}"><div><h3>${esc(state.user.charData.name)}</h3><p>${esc(state.user.charData.class)}</p><button class="btn ghost small" id="open-current-card">Открыть карточку персонажа</button></div></div></section><section><div class="section-title"><h3>Характеристики</h3></div><div class="stats-scroller" id="stats-scroller"></div></section>`;els.app.appendChild(container);const locImg=document.getElementById('loc-img');locImg.onload=()=>locImg.classList.add('loaded');locImg.onerror=()=>locImg.classList.add('loaded');renderStats();document.getElementById('prev-loc')?.addEventListener('click',()=>moveLocation(-1));document.getElementById('next-loc')?.addEventListener('click',()=>moveLocation(1));document.getElementById('btn-unlock')?.addEventListener('click',openUnlockModal);document.getElementById('open-current-card')?.addEventListener('click',()=>openCharacterCard(state.user.charData,{allowStart:false,current:true}))}
+      function isCollege(loc){return String(loc.title||'').toLowerCase().includes('коллегия магов')}
+      function moveLocation(delta){state.user.locationIndex=Math.max(0,Math.min(state.data.locations.length-1,state.user.locationIndex+delta));saveState();els.app.scrollTo(0,0);renderLocationScreen()}
+      function renderStats(){const scroller=document.getElementById('stats-scroller');if(!scroller)return;scroller.innerHTML='';Object.entries(state.user.charData.stats||{}).forEach(([key,val])=>{const item=document.createElement('div');item.className='stat-card';item.innerHTML=`<span class="stat-label">${esc(key)}</span><div class="stepper"><button data-action="dec" data-key="${esc(key)}">−</button><span>${esc(val)}</span><button data-action="inc" data-key="${esc(key)}">+</button></div>`;scroller.appendChild(item)});scroller.onclick=e=>{const b=e.target.closest('button');if(!b)return;const key=b.dataset.key;const span=b.parentElement.querySelector('span');let val=parseInt(span.textContent||'0',10);val+=b.dataset.action==='inc'?1:-1;span.textContent=val;state.user.charData.stats[key]=val;saveState()}}
+      function openCharacterCard(char,{allowStart=false,current=false}={}){const modal=document.createElement('div');modal.className='modal';const canStart=allowStart&&char.availableFromStart!==false;modal.innerHTML=`<div class="modal-content"><h2 style="text-align:center;margin-bottom:12px">${esc(char.name)} — ${esc(char.class)}</h2><img class="modal-card-image" src="${imgPath(char.cardImage||char.image)}" alt="${esc(char.name)}"><div class="modal-actions">${canStart?`<button class="btn" id="start-selected">Начать за ${esc(char.name)}</button>`:''}${!canStart&&!current&&char.availableFromStart===false?`<button class="btn ghost" disabled>${esc(char.unlockHint||'Герой откроется по сюжету')}</button>`:''}<button class="btn ghost" id="close-modal">Закрыть</button></div></div>`;document.body.appendChild(modal);setTimeout(()=>modal.classList.add('open'),10);modal.onclick=e=>{if(e.target===modal||e.target.id==='close-modal')closeModal(modal)};modal.querySelector('#start-selected')?.addEventListener('click',()=>startGame(char))}
+      function closeModal(modal){modal.classList.remove('open');setTimeout(()=>modal.remove(),180)}
+      function openUnlockModal(){const secretIds=['korgreyv','porje'];const chars=state.data.characters.filter(c=>secretIds.includes(String(c.id)));const modal=document.createElement('div');modal.className='modal';modal.innerHTML=`<div class="modal-content"><h2 style="text-align:center;margin-bottom:14px">Новые союзники</h2><div class="char-grid">${chars.map(c=>`<article class="card hero-option" data-unlock-id="${esc(c.id)}"><img class="card-art" src="${imgPath(c.cardImage||c.image)}" alt="${esc(c.name)}"><div class="hero-meta"><h3>${esc(c.name)}</h3><p>${esc(c.class)}</p><span class="pill">можно выбрать сейчас</span></div></article>`).join('')}</div><button class="btn ghost" id="close-modal" style="margin-top:14px">Отмена</button></div>`;document.body.appendChild(modal);setTimeout(()=>modal.classList.add('open'),10);modal.onclick=e=>{if(e.target===modal||e.target.id==='close-modal')closeModal(modal)};modal.querySelectorAll('[data-unlock-id]').forEach(node=>{node.onclick=()=>{const c=chars.find(x=>String(x.id)===String(node.dataset.unlockId));if(c)openSwitchConfirm(c,modal)}})}
+      function openSwitchConfirm(char,parentModal){if(confirm(`Сменить персонажа на ${char.name}? Инвентарь и заметки станут его.`)){state.user.charData=JSON.parse(JSON.stringify(char));state.user.selectedCharId=char.id;if(!state.user.charData.inventory)state.user.charData.inventory=[];if(!state.user.charData.notes)state.user.charData.notes=[];saveState();parentModal.remove();showToast(`Вы теперь: ${char.name}`);renderLocationScreen()}}
+      function openModal(type){if(type==='hero'){openCharacterCard(state.user.charData,{current:true});return}const modal=document.createElement('div');modal.className='modal';let content='';if(type==='dice'){content=`<h2>Бросок костей</h2><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0">${['D4','D6','D8','D10','D12','D20'].map(d=>`<button class="btn ghost dice-btn" data-d="${d}">${d}</button>`).join('')}</div><div id="dice-log" class="card" style="height:170px;overflow:auto;font-family:monospace;background:#080605"></div><button class="btn ghost" id="close-modal" style="margin-top:12px">Закрыть</button>`}else if(type==='inv'){content=`<h2>Инвентарь</h2><div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin:14px 0"><input id="new-item-input" class="input-field" placeholder="Название предмета..."><button id="add-item-btn" class="btn" style="width:auto;margin:0">+</button></div><div id="list-container"></div><button class="btn ghost" id="close-modal" style="margin-top:12px">Закрыть</button>`}else if(type==='notes'){content=`<h2>Заметки</h2><div style="display:grid;gap:8px;margin:14px 0"><textarea id="new-note-input" class="input-field" placeholder="Текст заметки..."></textarea><button id="add-note-btn" class="btn">Добавить заметку</button></div><div id="list-container"></div><button class="btn ghost" id="close-modal" style="margin-top:12px">Закрыть</button>`}modal.innerHTML=`<div class="modal-content">${content}</div>`;document.body.appendChild(modal);setTimeout(()=>modal.classList.add('open'),10);modal.onclick=e=>{if(e.target===modal||e.target.id==='close-modal')closeModal(modal);if(e.target.classList.contains('dice-btn')){const die=e.target.dataset.d,max=parseInt(die.slice(1),10),res=Math.floor(Math.random()*max)+1,log=modal.querySelector('#dice-log');log.innerHTML=`<div style="padding:8px;border-bottom:1px solid rgba(216,189,120,.15)">🎲 <b>${die}</b>: <span style="color:var(--gold);font-weight:900">${res}</span></div>`+log.innerHTML}};const renderList=(arrayName)=>{const box=modal.querySelector('#list-container');if(!box)return;const list=state.user.charData[arrayName]||[];box.innerHTML=list.length?list.map((item,i)=>`<div class="list-item"><div>${esc(item)}</div><button class="btn danger" data-del="${i}">✖</button></div>`).join(''):`<p style="text-align:center;opacity:.6">Пусто</p>`;box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.user.charData[arrayName].splice(+b.dataset.del,1);saveState();renderList(arrayName)})};if(type==='inv'){renderList('inventory');modal.querySelector('#add-item-btn').onclick=()=>{const input=modal.querySelector('#new-item-input');const v=input.value.trim();if(v){state.user.charData.inventory ||= [];state.user.charData.inventory.push(v);input.value='';saveState();renderList('inventory');showToast('Предмет добавлен')}}}if(type==='notes'){renderList('notes');modal.querySelector('#add-note-btn').onclick=()=>{const input=modal.querySelector('#new-note-input');const v=input.value.trim();if(v){state.user.charData.notes ||= [];state.user.charData.notes.push(v);input.value='';saveState();renderList('notes');showToast('Заметка добавлена')}}}}
+      els.navItems.forEach(btn=>btn.addEventListener('click',()=>{const t=btn.dataset.nav;setActiveNav(t);if(t==='map'){renderLocationScreen();return}openModal(t)}));
+      els.charIndicator.addEventListener('click',()=>state.user.charData&&openCharacterCard(state.user.charData,{current:true}));
+      els.btnHome.addEventListener('click',()=>{if(confirm('Выйти в главное меню?'))renderMainMenu()});
+      return{init};
     })();
-
-    // ВАЖНО: делаем доступным глобально (иначе onclick не увидит)
-    window.APP = APP;
-
-    // Запуск при загрузке
-    document.addEventListener('DOMContentLoaded', APP.init);
+    document.addEventListener('DOMContentLoaded',APP.init);
   </script>
 </body>
 </html>
